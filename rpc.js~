@@ -1,0 +1,27 @@
+
+
+
+var addFunc = function(f){
+        var res = f();
+     socket.emit("singleFR", res);
+}
+
+
+socket.once("singleF", function(msg){
+    var name = msg.name;
+    var args = msg.arg;
+    
+}
+
+
+function perform(name, args, cb){
+    socket.emit("singleF", {name: name, arg: args});
+    
+    socket.once("SingleFR", function(result){
+        cb(null, result);
+    });
+}
+
+Rpc.addFunc(function testRemote(a, b){
+    return a + b;
+}
