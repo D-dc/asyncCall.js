@@ -1,46 +1,49 @@
+//
+// RPC library.
+//
+
 if (typeof module !== 'undefined' && module.exports)
     module.exports = Rpc;
 
-function Rpc() {
+function Rpc(socket) {
+    console.log("new socket " + socket);
     this.noReplyTimeOut = 3000;
-    this.exposedFunction = [];
-
+    this.exposedFunctions = [];
+    this.socket = socket;
+    this.openCalls = [];
 };
+
 
 Rpc.prototype.expose = function(o) {
     var that = this;
 
     for (prop in o) {
-        if (!o.hasOwnProperty(prop)) {
+        if (!o.hasOwnProperty(prop)) {//reflection
             continue;
         }
 
-        this._exposeF(prop, o[prop]);
+        this._exposeFunction(prop, o[prop]);
     };
 
-
-    this.socket.on("fix", function(msg) {
-        if (msg.result != null || msg.error != null) //TODO cleanly filter out replies
+    //incoming function call
+    this.socket.on("fix", function(data) {
+        if (!data.id) //TODO cleanly filter out replies
             return;
 
-        var arr = that.exposedFunction;
+        var arr = that.exposedFunctions;
+        
         //lookup
         for (var i = 0; i < arr.length; i++) {
             var obj = arr[i];
-            if (obj.name == msg.name) {
-                obj.closure(msg);
+            if (obj.name == data.name) {
+                obj.closure(data.args, data.id);
                 return;
             }
         }
 
-        //TODO function not found
-        if (msg.id)
-            that.socket.emit(msg.id, {
-                result: null,
-                error: "function not found"
-            });
-        else
-            that.socket.emit(msg.id, {
+        //only reply to actual functions not found
+        if (data.id)
+            that.socket.emit(data.id, {
                 result: null,
                 error: "function not found"
             });
@@ -48,37 +51,33 @@ Rpc.prototype.expose = function(o) {
 };
 
 Rpc.prototype.genId = function(name) {
-    return name + Math.floor((Math.random() * 100) + 1);
+    return name + Math.floor((Math.random() * 1000) + 1);
 };
 
 
-Rpc.prototype._exposeF = function(n, f) {
+Rpc.prototype._exposeFunction = function(name, func) {
     var that = this;
 
-    var closure = function(msg) {
+    var closure = function(args, replyId) {
         try {
-            var name, args, id, res;
-            name = msg.name;
-            args = msg.arg;
-            id = msg.id;
-            res = f.apply(this, args);
-
-            that.socket.emit(id, {
-                result: res
+ 
+            var result = func.apply(this, args);
+            that.socket.emit(replyId, {
+                result: result,
             });
 
-        } catch (err) {
-            that.socket.emit(id, {
+        } catch (err) { 
+            // if the function throws an exception, indcate this
+            that.socket.emit(replyId, {
                 error: err
             });
 
         }
-
     };
 
     //push the closure
-    this.exposedFunction.push({
-        name: n,
+    this.exposedFunctions.push({
+        name: name,
         closure: closure
     });
 };
@@ -87,16 +86,15 @@ Rpc.prototype._exposeF = function(n, f) {
 
 
 Rpc.prototype.call = function(name, args, cb) {
-    var tid, listener, timer, socket;
+    var replyId, listener, timer, socket;
     var that = this;
 
-    tid = this.genId(name);
-    console.log("CALLING " + name + " @ " + this.id());
+    replyId = this.genId(name);
 
     this.socket.emit("fix", {//TODO rename
         name: name,
-        arg: args,
-        id: tid
+        args: args,
+        id: replyId
     });
 
 
@@ -104,31 +102,28 @@ Rpc.prototype.call = function(name, args, cb) {
     if (!cb) return; 
 
     listener = function(result) {
-        var err, res;
-        res = result.result;
-        err = result.error;
-        
+        var err = result.error, 
+            res = result.result;;
+
         clearTimeout(timer);
 
-        
-
         if (!err) {
-            cb(null, res); //everything ok
+            cb(null, res); //everything ok 
         } else {
-            console.error(err);
-            cb(err, null);
+            //console.error(err);
+            cb(err);
         }
     };
 
     //set a timer, because we are interested in reply after noReplyTimeOut
     timer = setTimeout(function() {
         var err = new Error("timedOut");
-        that.socket.removeListener(tid, listener); //remember to remove the listener
+        that.socket.removeListener(replyId, listener); //remember to remove the listener
         cb(err);
 
     }, this.noReplyTimeOut);
 
 
     //wait for reply
-    this.socket.once(tid, listener);
+    this.socket.once(replyId, listener);
 };

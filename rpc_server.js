@@ -1,76 +1,78 @@
- var express = require('express'),
-     app = express(),
-     serverHttp = require('http').createServer(app),
-     Server = require('socket.io'), //.listen(server);
-     io = new Server(serverHttp, serverOpts),
-     Rpc = require('./public/rpc.js'),
-     port = 80;
+//
+// RPC library, server side.
+// 
 
- serverHttp.listen(port, function() {
-     console.log('Server listening at port %d', port);
- });
- app.use("/", express.static(__dirname + '/public'));
+var Server = require('socket.io'),
+    Rpc = require('./public/rpc.js'),
+    port = 80;
 
 
- //see server options
- //https://github.com/Automattic/engine.io/blob/master/lib/server.js#L38
- var serverOpts = {
-     //heartbeat
-     pingTimeout: 6000, //timeout from client to receive new heartbeat from server (value shipped to client)
-     pingInterval: 2500, //timeout when server should send heartbeat to client
- };
+var ServerSingleSocket = function(socket, opts) {
+    this.options = opts;
+    Rpc.call(this, socket);
+    socket.on("error", function(err) {
+        console.error("Server: iosocket error " + err);
+    });
+}
+ServerSingleSocket.prototype = new Rpc();
 
 
- var ServerRpc = function(socket) {
-     ServerRpc.prototype.socket = socket;
-     socket.on("error", function(err) {
-         console.error("Server: iosocket error " + err);
-     });
- }
- ServerRpc.prototype = new Rpc();
 
- Rpc.prototype.id = function() {
-     return this.socket.id;
- }
+Rpc.prototype.id = function() {
+    return this.socket.id;
+}
 
- io.on('connection', function(socket) {
+//see server options
+//https://github.com/Automattic/engine.io/blob/master/lib/server.js#L38
+var defaultOptions = function() {
+    return {
+        //heartbeat
+        pingTimeout: 6000, //timeout from client to receive new heartbeat from server (value shipped to client)
+        pingInterval: 2500, //timeout when server should send heartbeat to client
+    };
+}
 
+var ServerRpc = function(serverHttp, opts) {
+    this.options = opts || defaultOptions();
+    this.io = new Server(serverHttp, this.options);
+    this.rpcList = [];
+    this.exposedFunctions;
+    var that = this;
 
-     var myServer = new ServerRpc(socket);
+    this.io.on('connection', function(socket) {
+        console.log("SOCKET" + socket);
+        var s = new ServerSingleSocket(socket, this.options);
+        s.expose(that.exposedFunctions);
+        that.rpcList.push(s);
 
-     //server-side methods
-     myServer.expose({
-         'testRemote': function(a, b) {
-             console.log("testRemote called, args: " + a + " " + b)
-             return a + b;
-         },
-         'pong': function(a) {
-             a = a + 1;
-             console.log("pong " + a);
-             setTimeout(function() {
-                 myServer.call("ping", [a])
-             }, 2000);
-         }
-     });
+    });
+}
 
-     //
-     // eigenlijke code
-     //
+ServerRpc.prototype.expose = function(o) {
+    this.exposedFunctions = o;
+}
 
-     var a = 5;
-     myServer.call("testClient", [a], function(err, res) {
-         if (err) console.error(err);
-         console.log("testClient 25 " + res);
-     });
-     myServer.call("ping", [1])
+module.exports = ServerRpc;
 
+////////////////////////////////////////////////////////////////////////////////////////////
 
-     test = function() {
+/*var c=1;
+var myServer = new ServerRpc(serverHttp);
+myServer.expose({
+     'testRemote': function(a, b) {
+        console.log("testRemote called")
+         //excess arguments are accessible via 'arguments'
+         var args = Array.prototype.slice.call(arguments);
+         console.log('received args' + args);
+         console.log("testRemote called, args: " + a + " " + b);
+         c++
+         return a + b;
+     },
+     'pong': function(b) {
+         b = b + 1;
+         console.log("pong " + b);
          setTimeout(function() {
-
-             socket.emit("non exist");
-             test();
-         }, 4000);
+             myServer.call("ping", [b])
+         }, 2000);
      }
-     test();
- });
+ });*/

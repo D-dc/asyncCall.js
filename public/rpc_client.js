@@ -1,18 +1,32 @@
+//
+// RPC library, client side.
+//
+
+//TODO: change this
+if (typeof module !== 'undefined' && module.exports) {
+    var Rpc = require('./rpc.js'),
+        io = require('../node_modules/socket.io/node_modules/socket.io-client');
+}
+
 //see clientside options
 //https://github.com/Automattic/socket.io-client/blob/master/lib/manager.js#L32
-var clientOpts = {
-    reconnection: true,
-    reconnectionAttempts: Infinity,
-    reconnectionDelay: 1000,
-    reconnectionDelayMax: 5000,
-    randomizationFactor: 0.5, // for the backoff
-    timeout: 20000,
-    autoConnect: true
-};
+var defaultOptions = function() {
+    return {
+        reconnection: true,
+        reconnectionAttempts: Infinity,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        randomizationFactor: 0.5, // for the backoff
+        timeout: 20000,
+        autoConnect: true
+    };
+}
 
 var ClientRpc = function(url, opts) {
-    socket = io(url, opts);
-    ClientRpc.prototype.socket = socket;
+    this.options = opts || defaultOptions();
+
+    var socket = io(url, this.options);
+    Rpc.call(this, socket);
     socket.on("error", function(err) {
         console.error("Client: iosocket error " + err);
     });
@@ -32,20 +46,23 @@ var ClientRpc = function(url, opts) {
 
 
 }
-
 ClientRpc.prototype = new Rpc();
 
 Rpc.prototype.id = function() {
-    return socket.io.engine.id;
+    return this.socket.io.engine.id;
 }
 
-myClient = new ClientRpc('http://127.0.0.1:80', clientOpts);
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = ClientRpc;
+}
 
 
-//
-// eigenlijke code
-//
+////////////////////////////////////////////////////////////////////////////////////////////
 
+
+
+/*myClient = new ClientRpc('http://127.0.0.1:80');
 myClient.expose({
     'testClient': function(a) {
         console.log("testClient")
@@ -57,7 +74,7 @@ myClient.expose({
             myClient.call("pong", [ctr])
         }, 2000);
     }
-})
+});
 
 var a = 1;
 var b = 2;
@@ -65,7 +82,9 @@ var c = 3;
 
 myClient.call("testRemote", [a, b], function(err, res) {
     if (err) console.error(err);
-    console.log("testRemote 3 " + res);
+
+    res += 3;
+    console.log("testRemote 6 " + res);
 });
 
 // myClient.call("testRemote", [c, c], function(err, res){
@@ -79,21 +98,21 @@ myClient.call("testRemote", [a, b], function(err, res) {
 //     console.log("testTwo 9 "+res);
 // });
 
-// myClient.call("testNoExist", [c, c], function(err, res){
-//     if(err){
-//         console.error(err);
+myClient.call("testNoExist", [c, c], function(err, res){
+    if(err){
+        console.error(err);
 
-//     }
-// });
+    }
+});
 
 callServer = function() {
     console.log(" callServer called")
-    myClient.call("testRemote", [a, b], function(err, res) {
-        if (err)
-            console.error(err);
-        else
-            console.log("callServer reply " + res);
-        //console.log("context " + a);
+    myClient.call("testRemote", [a, b, c], function(err, res) {
+        console.log("callServer reply " + res);
+        res += 3;
+        a++;
+        console.log("testRemote 6 " + res);
 
     });
 }
+*/
