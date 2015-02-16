@@ -11,11 +11,6 @@ serverHttp.listen(port, function() {
 app.use("/", express.static(__dirname + '/public'));
 
 
-
-var getFuncName = function(args) {
-    return name = args.callee.toString();
-}
-
 var myServer = new ServerRpc(serverHttp);
 myServer.expose({
     'testFuncNoArgs': function() {

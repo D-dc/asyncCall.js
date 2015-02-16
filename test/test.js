@@ -30,7 +30,7 @@ describe('server RPC', function() {
     /* testFuncNoArgs */
     describe('testFuncNoArgs', function() {
         it('rpc should return true', function(done) {
-            myClient.call('testFuncNoArgs', [], function(err, res) {
+            myClient.rpcCall('testFuncNoArgs', [], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, true);
                 done();
@@ -39,7 +39,7 @@ describe('server RPC', function() {
 
 
         it('rpc should accept arguments', function(done) {
-            myClient.call('testFuncNoArgs', [1, 2, 3], function(err, res) {
+            myClient.rpcCall('testFuncNoArgs', [1, 2, 3], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, true);
                 done();
@@ -52,7 +52,7 @@ describe('server RPC', function() {
     describe('testFuncSingleArg', function() {
         var arg = 1;
         it('rpc should return the argument', function(done) {
-            myClient.call('testFuncSingleArg', [arg], function(err, res) {
+            myClient.rpcCall('testFuncSingleArg', [arg], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, arg);
                 done();
@@ -60,7 +60,7 @@ describe('server RPC', function() {
         });
 
         it('rpc should accept no arguments', function(done) {
-            myClient.call('testFuncSingleArg', [], function(err, res) {
+            myClient.rpcCall('testFuncSingleArg', [], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, undefined);
                 done();
@@ -68,7 +68,7 @@ describe('server RPC', function() {
         });
 
         it('rpc should ignore too many arguments', function(done) {
-            myClient.call('testFuncSingleArg', [arg, 2], function(err, res) {
+            myClient.rpcCall('testFuncSingleArg', [arg, 2], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, arg);
                 done();
@@ -83,7 +83,7 @@ describe('server RPC', function() {
         var arg1 = 'a';
         var arg2 = 'b';
         it('rpc should return the concat', function(done) {
-            myClient.call('testFuncTwoArg', [arg1, arg2], function(err, res) {
+            myClient.rpcCall('testFuncTwoArg', [arg1, arg2], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, (arg1 + arg2));
                 done();
@@ -93,7 +93,7 @@ describe('server RPC', function() {
         var arg1 = 1;
         var arg2 = 2;
         it('rpc should return the sum', function(done) {
-            myClient.call('testFuncTwoArg', [arg1, arg2], function(err, res) {
+            myClient.rpcCall('testFuncTwoArg', [arg1, arg2], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, (arg1 + arg2));
                 done();
@@ -101,7 +101,7 @@ describe('server RPC', function() {
         });
 
         it('rpc should accept no arguments', function(done) {
-            myClient.call('testFuncTwoArg', [], function(err, res) {
+            myClient.rpcCall('testFuncTwoArg', [], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, null);
                 done();
@@ -109,7 +109,7 @@ describe('server RPC', function() {
         });
 
         it('rpc should ignore too many arguments', function(done) {
-            myClient.call('testFuncTwoArg', [arg1, arg2, arg2], function(err, res) {
+            myClient.rpcCall('testFuncTwoArg', [arg1, arg2, arg2], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, (arg1 + arg2));
                 done();
@@ -123,7 +123,7 @@ describe('server RPC', function() {
         var arg1 = 'a';
         var arg2 = 'b';
         it('rpc should accept no arguments', function(done) {
-            myClient.call('testFuncNoReturn', [], function(err, res) {
+            myClient.rpcCall('testFuncNoReturn', [], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, undefined);
                 done();
@@ -131,7 +131,7 @@ describe('server RPC', function() {
         });
 
         it('rpc should accept 1 argument', function(done) {
-            myClient.call('testFuncNoReturn', [arg1], function(err, res) {
+            myClient.rpcCall('testFuncNoReturn', [arg1], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, undefined);
                 done();
@@ -139,7 +139,7 @@ describe('server RPC', function() {
         });
 
         it('rpc should accept 2 arguments', function(done) {
-            myClient.call('testFuncNoReturn', [arg1, arg2], function(err, res) {
+            myClient.rpcCall('testFuncNoReturn', [arg1, arg2], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, undefined);
                 done();
@@ -154,7 +154,7 @@ describe('server RPC', function() {
         var arg1 = 1;
         var arg2 = 2;
         it('rpc should return sum', function(done) {
-            myClient.call('testFuncSum', [arg1, arg2], function(err, res) {
+            myClient.rpcCall('testFuncSum', [arg1, arg2], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, arg1 + arg2);
                 done();
@@ -162,7 +162,7 @@ describe('server RPC', function() {
         });
 
         it('rpc should return sum', function(done) {
-            myClient.call('testFuncSum', [arg1, arg1], function(err, res) {
+            myClient.rpcCall('testFuncSum', [arg1, arg1], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, arg1 + arg1);
                 done();
@@ -170,7 +170,7 @@ describe('server RPC', function() {
         });
 
         it('rpc should accept fewer arguments', function(done) {
-            myClient.call('testFuncSum', [arg1], function(err, res) {
+            myClient.rpcCall('testFuncSum', [arg1], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, null);
                 done();
@@ -178,7 +178,7 @@ describe('server RPC', function() {
         });
 
         it('rpc should return sum', function(done) {
-            myClient.call('testFuncSum', [null, arg1], function(err, res) {
+            myClient.rpcCall('testFuncSum', [null, arg1], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, arg1);
                 done();
@@ -186,7 +186,7 @@ describe('server RPC', function() {
         });
 
         it('rpc should return sum', function(done) {
-            myClient.call('testFuncSum', [null, arg2], function(err, res) {
+            myClient.rpcCall('testFuncSum', [null, arg2], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, arg2);
                 done();
@@ -200,7 +200,7 @@ describe('server RPC', function() {
         var arg = 1;
         var arg2 = 100
         it('rpc should return incremented argument', function(done) {
-            myClient.call('testFuncIncrement', [arg], function(err, res) {
+            myClient.rpcCall('testFuncIncrement', [arg], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, arg + 1);
                 done();
@@ -208,7 +208,7 @@ describe('server RPC', function() {
         });
 
         it('rpc should return incremented argument', function(done) {
-            myClient.call('testFuncIncrement', [arg2], function(err, res) {
+            myClient.rpcCall('testFuncIncrement', [arg2], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, arg2 + 1);
                 done();
@@ -216,7 +216,7 @@ describe('server RPC', function() {
         });
 
         it('rpc should ignore too many arguments', function(done) {
-            myClient.call('testFuncIncrement', [arg, 2], function(err, res) {
+            myClient.rpcCall('testFuncIncrement', [arg, 2], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, arg + 1);
                 done();
@@ -230,7 +230,7 @@ describe('server RPC', function() {
         var arg = 1;
 
         it('rpc should have error argument in callback set', function(done) {
-            myClient.call('testExplicitException', [], function(err, res) {
+            myClient.rpcCall('testExplicitException', [], function(err, res) {
                 assert.notEqual(err, null)
                 assert.strictEqual(res, undefined);
                 done();
@@ -238,7 +238,7 @@ describe('server RPC', function() {
         });
 
         it('rpc should have error argument in callback set', function(done) {
-            myClient.call('testExplicitException', [arg], function(err, res) {
+            myClient.rpcCall('testExplicitException', [arg], function(err, res) {
                 assert.notEqual(err, null)
                 assert.strictEqual(res, undefined);
                 done();
@@ -252,7 +252,7 @@ describe('server RPC', function() {
         var arg = 'abc';
 
         it('rpc should not have callback error argument set', function(done) {
-            myClient.call('testImplicitException', [arg], function(err, res) {
+            myClient.rpcCall('testImplicitException', [arg], function(err, res) {
                 assert.ifError(err);
                 assert.strictEqual(res, 3);
                 done();
@@ -260,7 +260,7 @@ describe('server RPC', function() {
         });
 
         it('rpc should have error argument in callback set', function(done) {
-            myClient.call('testImplicitException', [null], function(err, res) {
+            myClient.rpcCall('testImplicitException', [null], function(err, res) {
                 assert.notEqual(err, null)
                 assert.strictEqual(res, undefined);
                 done();
@@ -268,5 +268,25 @@ describe('server RPC', function() {
         });
     });
 
+
+    /* test undefined function */
+    describe('test undefined function', function() {
+        it('rpc should have error argument set', function(done) {
+            myClient.rpcCall('testFuncUndefined', [], function(err, res) {
+                assert.notEqual(err, null)
+                assert.strictEqual(res, undefined);
+                done();
+            });
+        });
+
+
+        it('rpc should have error argument set', function(done) {
+            myClient.rpcCall('testFuncUndefined', [1, 2, 3], function(err, res) {
+                assert.notEqual(err, null)
+                assert.strictEqual(res, undefined);
+                done();
+            });
+        });
+    });
 
 })

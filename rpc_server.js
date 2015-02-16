@@ -3,24 +3,11 @@
 // 
 
 var Server = require('socket.io'),
-    Rpc = require('./public/rpc.js'),
-    port = 80;
-
-
-var ServerSingleSocket = function(socket, opts) {
-    this.options = opts;
-    Rpc.call(this, socket);
-    socket.on("error", function(err) {
-        console.error("Server: iosocket error " + err);
-    });
-}
-ServerSingleSocket.prototype = new Rpc();
+    ServerSingleSocket = require('./public/rpc.js'),
+    port = process.env.PORT || 80;
 
 
 
-Rpc.prototype.id = function() {
-    return this.socket.id;
-}
 
 //see server options
 //https://github.com/Automattic/engine.io/blob/master/lib/server.js#L38
@@ -35,7 +22,7 @@ var defaultOptions = function() {
 var ServerRpc = function(serverHttp, opts) {
     this.options = opts || defaultOptions();
     this.io = new Server(serverHttp, this.options);
-    this.rpcList = [];
+    this.connectedClients = [];
     this.exposedFunctions;
     var that = this;
 
@@ -43,7 +30,8 @@ var ServerRpc = function(serverHttp, opts) {
         console.log("SOCKET" + socket);
         var s = new ServerSingleSocket(socket, this.options);
         s.expose(that.exposedFunctions);
-        that.rpcList.push(s);
+        that.connectedClients.push(s);
+
 
     });
 }
@@ -52,11 +40,31 @@ ServerRpc.prototype.expose = function(o) {
     this.exposedFunctions = o;
 }
 
+ServerRpc.prototype.rpcCall = function(name, args, cb) {
+    for (var c in this.connectedClients){
+        this.connectedClients[c].rpcCall(name, args, cb);
+    }
+}
+
 module.exports = ServerRpc;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-/*var c=1;
+
+var express = require('express'),
+    app = express(),
+    serverHttp = require('http').createServer(app),
+    Rpc = require('./public/rpc.js');
+
+serverHttp.listen(port, function() {
+    console.log('Server listening at port %d', port);
+});
+app.use("/", express.static(__dirname + '/public'));
+
+
+
+
+var c=1;
 var myServer = new ServerRpc(serverHttp);
 myServer.expose({
      'testRemote': function(a, b) {
@@ -72,7 +80,10 @@ myServer.expose({
          b = b + 1;
          console.log("pong " + b);
          setTimeout(function() {
-             myServer.call("ping", [b])
+             myServer.rpcCall("ping", [b])
          }, 2000);
      }
- });*/
+ });
+
+
+
