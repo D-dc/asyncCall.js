@@ -1,11 +1,11 @@
 
 var ServerRpc = require('./test-server.js'),
-    Rpc = require('../public/rpc.js'),
     ClientRpc = require('../public/rpc_client.js'),
     assert = require("assert");
 
 
 myClient = new ClientRpc('http://127.0.0.1:8123');
+
 
 //TODO bidirectional tests
 
@@ -31,6 +31,8 @@ describe('server RPC', function() {
     describe('testFuncNoArgs', function() {
         it('rpc should return true', function(done) {
             myClient.rpcCall('testFuncNoArgs', [], function(err, res) {
+
+                console.log('AA', err, res);
                 assert.ifError(err);
                 assert.strictEqual(res, true);
                 done();
@@ -40,6 +42,7 @@ describe('server RPC', function() {
 
         it('rpc should accept arguments', function(done) {
             myClient.rpcCall('testFuncNoArgs', [1, 2, 3], function(err, res) {
+                console.log('AA', err, res);
                 assert.ifError(err);
                 assert.strictEqual(res, true);
                 done();
@@ -286,6 +289,31 @@ describe('server RPC', function() {
                 assert.strictEqual(res, undefined);
                 done();
             });
+        });
+    });
+
+
+    /* test undefined function */
+    describe('test slow reply', function() {
+        it('rpc should have error argument set', function(done) {
+            myClient.rpcCall('testSlowComputation', [], function(err, res) {
+                console.log(err, res);
+                assert.notEqual(err, null)
+                assert.strictEqual(res, undefined);
+                console.log('done')
+                done();
+            }, 1000);
+        });
+
+
+        it('rpc should have error argument set', function(done) {
+            var fixDate = new Date();
+            myClient.rpcCall('testSlowComputation', [], function(err, res) {
+                var now =  new Date();
+                console.log(err, res, fixDate, now, now-fixDate);
+                assert.strictEqual((now-fixDate<1500), true);
+                done();
+            }, 1000);
         });
     });
 

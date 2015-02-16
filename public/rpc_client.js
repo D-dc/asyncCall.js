@@ -2,23 +2,30 @@
 // RPC library, client side.
 //
 
+var debug = true;
+
+var log = function(msg){
+    if(debug)
+        console.log(msg);
+}
+
 //TODO: change this
 if (typeof module !== 'undefined' && module.exports) {
-    var Rpc = require('./rpc.js'),
-        io = require('../node_modules/socket.io/node_modules/socket.io-client');
+    var io = require('../node_modules/socket.io/node_modules/socket.io-client');
 }
 
 //see clientside options
 //https://github.com/Automattic/socket.io-client/blob/master/lib/manager.js#L32
 var defaultOptions = function() {
     return {
-        reconnection: true,
-        reconnectionAttempts: Infinity,
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 5000,
-        randomizationFactor: 0.5, // for the backoff
-        timeout: 20000,
-        autoConnect: true
+        reconnection: true,             //auto reconnect
+        reconnectionAttempts: Infinity, //attempts before giving up
+        reconnectionDelay: 1000,        //how long to wait before reconnect (doubles + randomized by randomizationFactor)
+        reconnectionDelayMax: 5000,     //max delay before reconnection
+        randomizationFactor: 0.5, 
+        timeout: 20000,                 //time before connect_error, connect_timeout events
+        autoConnect: true,              //automatically connect
+        defaultReplyTimeOut: Infinity   //default delay before an RPC call should have its reply. Infinity = no timeout
     };
 }
 
@@ -28,21 +35,29 @@ var defaultOptions = function() {
 var ClientRpc = function(url, opts) {
     this.options = opts || defaultOptions();
     this.socket = io(url, this.options);
-    this.noReplyTimeOut = 3000;
+    
+    this.defaultReplyTimeOut = this.options.defaultReplyTimeOut;
     this.exposedFunctions = [];
     this.openCalls = [];
     this.clientId = -1;
     
     var that = this;
-    this.socket.on('connect', function () {
-        that.socket.emit('init');
-        that.socket.on('init1', function(data){
-            that.clientId = data.clientId;
-        })
-    });
-
     this.socket.on("error", function(err) {
         console.error("Client: iosocket error " + err);
+    });
+
+    this.socket.on('connect', function () {
+        
+        if(typeof module !== 'undefined' && module.exports) return; //ugly hack 
+        
+        var originalId = localStorage.getItem('rpcid');
+        that.socket.emit('init', {'clientId':originalId});
+        if(!originalId){
+            that.socket.on('init1', function(data){
+                localStorage.setItem('rpcid', data.clientId);
+                that.clientId = data.clientId;
+            })
+        }
     });
 }
 
@@ -63,31 +78,30 @@ ClientRpc.prototype.expose = function(o) {
         if (!o.hasOwnProperty(prop)) {//reflection
             continue;
         }
-
         this._exposeFunction(prop, o[prop]);
     };
 
     //incoming function call
     this.socket.on("fix", function(data) {
+        log('INCOMING DATA' + JSON.stringify(data));
         if (!data.reply) //TODO cleanly filter out replies
-            return;
+            return; // ignore replies
 
         var arr = that.exposedFunctions;
         
         //lookup and apply
         for (var i = 0; i < arr.length; i++) {
             var obj = arr[i];
-            if (obj.name == data.name) {
+            if (obj.name === data.name) {
                 obj.closure(data.args, data.reply);
                 return;
             }
         }
 
-        //only reply to actual functions not found
+        //function call for undefined function
         if (data.reply)
             that.socket.emit(data.reply, {
-                result: null,
-                error: "function not found"
+                error: new Error("function not found")
             });
     });
 };
@@ -111,16 +125,17 @@ ClientRpc.prototype._exposeFunction = function(name, func) {
             
             //Call and reply
             var result = func.apply(this, args);
-            that.socket.emit(replyId, {
+            log('REPLY', replyId, JSON.stringify(result));
+            that.socket.emit(replyId, { //return value
                 result: result,
             });
 
         } catch (err) { 
-            // if the function throws an exception, indcate this
+            // function call resulted in exception
+            log('REPLY', replyId, JSON.stringify(err));
             that.socket.emit(replyId, {
                 error: err
             });
-
         }
     };
 
@@ -135,10 +150,7 @@ ClientRpc.prototype._exposeFunction = function(name, func) {
     Perform an RPC
 */
 ClientRpc.prototype.rpcCall = function(name, args, cb, due) {
-    console.log("rpcCall ", name, args, cb);
     var replyId, listener, timer, socket;
-    
-
     replyId = this._genId(name);
 
     var thunk = {
@@ -154,58 +166,54 @@ ClientRpc.prototype.rpcCall = function(name, args, cb, due) {
 
     this.openCalls.push(savedCall);
 
-    this.socket.emit("fix", {//TODO rename
+    var send = {
         name: name,
         args: args,
         reply: replyId
-    });
+    };
+    this.socket.emit("fix", send);//TODO rename
+    log('SEND DATA' + JSON.stringify(send));
+    
+    removeOpenCall = function(){
+        log('open calls ', that.openCalls.length)
+        //console.log(that.openCalls);
+        for (var i in that.openCalls){
+            //console.log(replyId, that.openCalls[i].replyId)
+            if (replyId === that.openCalls[i].replyId){
+                that.openCalls.splice(i, 1);
+            }
+        }
+    };
+
+    if (!due) due = this.defaultReplyTimeOut;
+    if (due !== Infinity)
+        timer = setTimeout(function() {
+            var err = new Error(name + " " + args +" call timed out");
+            removeOpenCall();
+            that.socket.removeListener(replyId, listener);
+            cb(err); // ATM just continue with error argument set
+        }, due);
+
     var that = this;
 
-    //there is no callback, so don't wait for reply
-    //if (!cb) return; 
-    if (!due) due = this.noReplyTimeOut;
-
     listener = function(result) {
+        console.log('rr', result)
         var err = result.error, 
             res = result.result;
 
-        clearTimeout(timer);
-
-
-        console.log(that.openCalls);
-        function findIndex(){
-            for (var i in this.openCalls){
-                if (that.replyId === replyId)
-                    return i
-            };
-        };
-        that.openCalls.splice(findIndex(), 1);
-        console.log(that.openCalls);
-
+        if(timer) clearTimeout(timer);
+        removeOpenCall();
 
         if (!err) {
             if (cb) cb(null, res); //everything ok 
         } else {
-            //console.error(err);
             if (cb) cb(err);
         }
     };
 
-    //set a timer, because we are interested in reply after noReplyTimeOut
-    timer = setTimeout(function() {
-        var err = new Error("call timed out");
-        that.socket.removeListener(replyId, listener);
-        cb(err); // ATM just continue with error argument set
-
-    }, due);
-
-
     //wait for reply
     this.socket.once(replyId, listener);
 };
-
-
-
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ClientRpc;
@@ -213,48 +221,3 @@ if (typeof module !== 'undefined' && module.exports) {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-myClient = new ClientRpc('http://127.0.0.1:80');
-myClient.expose({
-    'testClient': function(a) {
-        console.log("testClient")
-        return a * a;
-    },
-    'ping': function(ctr) {
-        console.log("ping " + ctr);
-        setTimeout(function() {
-            myClient.rpcCall("pong", [ctr])
-        }, 2000);
-    }
-});
-
-var a = 1;
-var b = 2;
-var c = 3;
-
-myClient.rpcCall("testRemote", [a, b], function(err, res) {
-    if (err) console.error(err);
-
-    res += 3;
-    console.log("testRemote 6 " + res);
-});
-
-myClient.rpcCall("testNoExist", [c, c], function(err, res){
-    if(err){
-        console.error(err);
-    }
-});
-
-callServer = function() {
-    console.log(" callServer called")
-    myClient.rpcCall("testRemote", [a, b, c], function(err, res) {
-        console.log("callServer reply " + res);
-        res += 3;
-        a++;
-        console.log("testRemote 6 " + res);
-
-    });
-}
-//myClient.rpcCall("pong", [1]);

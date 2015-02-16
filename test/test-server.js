@@ -1,8 +1,7 @@
 var express = require('express'),
     app = express(),
     serverHttp = require('http').createServer(app),
-    Rpc = require('../public/rpc.js'),
-    ServerRpc = require('../rpc_server.js'),
+    ServerRpc = require('../lib/rpc_server.js'),
     port = 8123;
 
 serverHttp.listen(port, function() {
@@ -11,9 +10,19 @@ serverHttp.listen(port, function() {
 app.use("/", express.static(__dirname + '/public'));
 
 
+function simulateSlowComputation(millis){
+	var fixDate = new Date();
+	var current = null;
+	do { current = new Date(); }
+	while(current-fixDate < millis);
+};
+
+
+
 var myServer = new ServerRpc(serverHttp);
 myServer.expose({
     'testFuncNoArgs': function() {
+        console.log('ja');
         return true;
     },
     'testFuncSingleArg': function(a) {
@@ -37,5 +46,9 @@ myServer.expose({
     },
     'testImplicitException': function(b) {
         return b.length;
-    }
+    },
+    'testSlowComputation': function() {
+        simulateSlowComputation(1000); //take some time to give reply
+        return true;
+    },
 });
