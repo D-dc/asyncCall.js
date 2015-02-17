@@ -2,7 +2,7 @@
 // RPC library, client side.
 //
 
-var debug = true;
+var debug = false;
 
 var log = function(msg){
     if(debug)
@@ -197,7 +197,6 @@ ClientRpc.prototype.rpcCall = function(name, args, cb, due) {
     var that = this;
 
     listener = function(result) {
-        console.log('rr', result)
         var err = result.error, 
             res = result.result;
 

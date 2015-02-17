@@ -18,11 +18,10 @@ function simulateSlowComputation(millis){
 };
 
 
-
+var g=0;
 var myServer = new ServerRpc(serverHttp);
 myServer.expose({
     'testFuncNoArgs': function() {
-        console.log('ja');
         return true;
     },
     'testFuncSingleArg': function(a) {
@@ -30,6 +29,9 @@ myServer.expose({
     },
     'testFuncTwoArg': function(a, b) {
         return a + b;
+    },
+    'testFuncArgumentsVar': function(a){
+        return Array.prototype.slice.call(arguments);
     },
     'testFuncNoReturn': function() {
 
@@ -51,4 +53,10 @@ myServer.expose({
         simulateSlowComputation(1000); //take some time to give reply
         return true;
     },
+    'testProgVar': function() {
+        g++;
+        return g;
+    }
 });
+
+module.exports = myServer;
