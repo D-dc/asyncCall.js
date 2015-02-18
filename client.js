@@ -1,8 +1,8 @@
 myClient = new ClientRpc('http://127.0.0.1:80');
 myClient.expose({
     'testClient': function(a) {
-        console.log("testClient")
-        return a * a;
+        console.log("testClient", a, ' called');
+        return a;
     },
     'ping': function(ctr) {
         console.log("ping " + ctr);
@@ -16,10 +16,10 @@ var a = 1;
 var b = 2;
 var c = 3;
 
-myClient.rpcCall("testRemote", [a, b], function(err, res) {
+/*myClient.rpcCall("testRemote", [a, b], function(err, res) {
     res += 3;
     console.log("testRemote 6 " + res);
-});
+});*/
 
 /*myClient.rpcCall("slow", [], function(err, res){
     if(err){
@@ -35,7 +35,7 @@ callServer = function() {
     console.log(" callServer called")
     myClient.rpcCall("testRemote", [a, b, c], function(err, res) {
         console.log("callServer reply " + res, err);
-    }, 100);
+    });
 }
 
 /*
@@ -45,5 +45,5 @@ callServerDue = function() {
     console.log(" callServer called")
     myClient.rpcCall("testRemote", [a, b, c], function(err, res) {
         console.log("callServer reply " + res, err);
-    }, 20);
+    },2);
 }

@@ -1,6 +1,6 @@
 
 var myServer = require('./test-server.js'),
-    ClientRpc = require('../public/rpc_client.js'),
+    ClientRpc = require('../rpc_client.js'),
     assert = require("assert"),
     expect = require('chai').expect;
 

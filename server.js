@@ -7,7 +7,7 @@ var express = require('express'),
 serverHttp.listen(port, function() {
     console.log('Server listening at port %d', port);
 });
-app.use("/", express.static(__dirname + '/public'));
+app.use("/", express.static(__dirname + '/'));
 
 var c=1;
 var myServer = new ServerRpc(serverHttp);
@@ -31,10 +31,35 @@ myServer.expose({
      }
  });
 
+var d=0;
 callClient = function() {
-    myServer.rpcCall("testClient", [5], function(err, res) {
-        console.log("testClient reply " + res, err);
+	console.log("testClient " + d);
+    myServer.rpcCall("testClient", [d], function(err, res) {
+    	console.log("testClient reply " + d);
+    	d++;
+        
     });
-    setTimeout(function(){callClient();}, 10000);
+    setTimeout(function(){callClient();}, 5000);
 }
 callClient();
+
+/*var e =0;
+callClientFast = function() {
+    console.log("testClient " + d, e);
+    if(e>20)return
+        e++;
+    myServer.rpcCall("testClient", [d], function(err, res) {
+        console.log("testClient reply " + d);
+        d++;
+        
+    });
+    setTimeout(callClientFast(), 50);};
+
+
+setTimeout(function(){callClientFast();}, 10000);;*/
+console.log("testClient")
+myServer.rpcCall("testClient", [d], function(err, res) {
+        console.log("testClient reply " + d);
+        d++;
+        
+    });
