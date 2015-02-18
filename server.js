@@ -31,17 +31,9 @@ myServer.expose({
      }
  });
 
+
 var d=0;
-callClient = function() {
-	console.log("testClient " + d);
-    myServer.rpcCall("testClient", [d], function(err, res) {
-    	console.log("testClient reply " + d);
-    	d++;
-        
-    });
-    setTimeout(function(){callClient();}, 5000);
-}
-callClient();
+
 
 /*var e =0;
 callClientFast = function() {
@@ -57,9 +49,24 @@ callClientFast = function() {
 
 
 setTimeout(function(){callClientFast();}, 10000);;*/
-console.log("testClient")
-myServer.rpcCall("testClient", [d], function(err, res) {
+//console.log("testClient")
+
+myServer.onConnection(function(){
+
+    myServer.rpcCall("testClient", [d], function(err, res) {
         console.log("testClient reply " + d);
         d++;
-        
     });
+
+    
+    callClient = function() {
+        console.log("testClient " + d);
+        myServer.rpcCall("testClient", [d], function(err, res) {
+            console.log("testClient reply " + d);
+            d++;
+            
+        });
+        setTimeout(function(){callClient();}, 5000);
+    }
+    callClient();
+});

@@ -6,6 +6,7 @@ var myServer = require('./test-server.js'),
 
 
 myClient = new ClientRpc('http://127.0.0.1:8123');
+myClient2 = new ClientRpc('http://127.0.0.1:8123');
 
 g=0;
 myClient.expose({
@@ -49,17 +50,52 @@ myClient.expose({
 
 
 // TESTS
-var tests = function(side, info){
 
+
+
+describe('general tests', function() {
+    it('openCalls parameters should be correct', function(done) {
+            this.exposedFunctions = [];
+            var c = myClient.RPC;          
+            expect(c.openCalls.length).to.equal(0);
+            done();
+    });
+
+    it('openCalls parameters should be correct', function(done) {
+            this.exposedFunctions = [];
+            var c = myClient.RPC;
+            myClient.rpcCall('nonexist');
+            expect(c.openCalls.length).to.equal(1);
+            done();
+    });
+
+    it('openCalls parameters should be correct', function(done) {
+            this.exposedFunctions = [];
+            var c = myClient2.RPC;
+            myClient2.rpcCall('nonexist');
+            myClient2.rpcCall('nonexist');
+            myClient2.rpcCall('nonexist');
+            expect(c.openCalls.length).to.equal(3);
+            done();
+    });
+
+});
+
+
+var tests = function(side, info){
+    
 
     describe(info, function() {
         
         /* testFuncNoArgs */
         describe('testFuncNoArgs', function() {
             it('rpc should return true', function(done) {
+                console.log('exec');
                 side.rpcCall('testFuncNoArgs', [], function(err, res) {
+                    console.log('exec', myServer.connectedClients.length, err, res);
                     expect(err).to.equal(null);
                     expect(res).to.be.true;
+
                     done();
                 });
             });
@@ -382,8 +418,10 @@ var tests = function(side, info){
         });
 
         /* test undefined function */
-        describe('test slow reply', function() {
-            it('rpc should have error argument set', function(done) {
+        describe('test for @due', function() {
+
+            it('rpc should timeout', function(done) {
+                this.timeout(1200);
                 side.rpcCall('testSlowComputation', [], function(err, res) {
                     expect(err).not.to.be.null;
                     expect(res).to.equal( undefined);
@@ -391,8 +429,8 @@ var tests = function(side, info){
                 }, 1000);
             });
 
-
-            it('rpc should have error argument set', function(done) {
+            it('rpc should timeout', function(done) {
+                this.timeout(1200);
                 var fixDate = new Date();
                 side.rpcCall('testSlowComputation', [], function(err, res) {
                     var now =  new Date();
@@ -401,13 +439,22 @@ var tests = function(side, info){
                 }, 1000);
             });
 
+            it('rpc should fail immediately', function(done) {
+                this.timeout(25);
+                var fixDate = new Date();
+                side.rpcCall('testFuncNoReturn', [], function(err, res) {
+                    done();
+                }, 1);
+            });
+
         });
 
     });
+
 };
 
 //Run the tests from both sides
 tests(myClient, 'From Client RPC to server');
-tests(myServer, 'From Server RPC to client');
+
 
 //TODO bidirectional tests
