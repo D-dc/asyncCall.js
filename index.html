@@ -5,13 +5,16 @@
   <title>RPC</title>
 </head>
 <body>
-  <input type="submit" onclick="javascript:callServer();" value="callServer No Due" />
-  <input type="submit" onclick="javascript:callServerDue();" value="callServer Due" />
+  <input type="submit" onclick="javascript:callServer();" value="RPC to Server No Due" />
+  <input type="submit" onclick="javascript:callServerDue();" value="RPC to Server Due" />
+  <input type="submit" onclick="javascript:callServerInexist();" value="RPC to Server function not exists" />
+  <input type="submit" onclick="javascript:callServerTriggerException();" value="RPC to Server Exception in body" />
   <script src="/socket.io/socket.io.js"></script>
   
   <!-- browserify this later -->
+  <script src="/lib/exception.js"></script>
   <script src="/lib/rpc.js"></script>
-  <script src="/rpc_client.js"></script>
+  <script src="/lib/rpc_client.js"></script>
 
   <!-- actual code -->
   <script src="/client.js"></script>

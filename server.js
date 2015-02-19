@@ -28,6 +28,10 @@ myServer.expose({
      },
      'slow': function() {
         //pausecomp(10000);
+     },
+     'triggerException': function(){
+        var d;
+        d.getA;
      }
  });
 
@@ -53,12 +57,13 @@ setTimeout(function(){callClientFast();}, 10000);;*/
 
 myServer.onConnection(function(){
 
-    myServer.rpcCall("testClient", [d], function(err, res) {
+    /*myServer.rpcCall("testClient", [d], function(err, res) {
         console.log("testClient reply " + d);
         d++;
-    });
+    });*/
 
     
+
     callClient = function() {
         console.log("testClient " + d);
         myServer.rpcCall("testClient", [d], function(err, res) {

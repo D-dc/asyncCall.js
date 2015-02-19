@@ -1,6 +1,6 @@
 
 var myServer = require('./test-server.js'),
-    ClientRpc = require('../rpc_client.js'),
+    ClientRpc = require('../lib/rpc_client.js'),
     assert = require("assert"),
     expect = require('chai').expect;
 
@@ -90,12 +90,9 @@ var tests = function(side, info){
         /* testFuncNoArgs */
         describe('testFuncNoArgs', function() {
             it('rpc should return true', function(done) {
-                console.log('exec');
                 side.rpcCall('testFuncNoArgs', [], function(err, res) {
-                    console.log('exec', myServer.connectedClients.length, err, res);
                     expect(err).to.equal(null);
                     expect(res).to.be.true;
-
                     done();
                 });
             });
@@ -309,50 +306,134 @@ var tests = function(side, info){
             });
         });
 
+        describe('Exceptions', function() {
+            /* testExplicitException */
+            describe('testExplicitException', function() {
+                var arg = 1;
 
-        /* testExplicitException */
-        describe('testExplicitException', function() {
-            var arg = 1;
+                it('rpc should have error argument in callback set', function(done) {
+                    side.rpcCall('testExplicitException', [], function(err, res) {
+                        expect(err).not.to.be.null;
+                        expect(err.name).to.equal('Error')
+                        expect(res).to.be.undefined;
+                        done();
+                    });
+                });
 
-            it('rpc should have error argument in callback set', function(done) {
-                side.rpcCall('testExplicitException', [], function(err, res) {
+                it('rpc should have error argument in callback set', function(done) {
+                    side.rpcCall('testExplicitException', [arg], function(err, res) {
+                        expect(err).not.to.be.null;
+                        expect(err.name).to.equal('Error')
+                        expect(res).to.be.undefined;
+                        done();
+                    });
+                });
+            });
+
+            /* testExplicitExceptionCustom */
+            describe('testExplicitExceptionCustom', function() {
+                var arg = 1;
+
+                it('rpc body custom throwable should map to Error', function(done) {
+                    side.rpcCall('testExplicitExceptionCustom', [], function(err, res) {
+                        expect(err).not.to.be.null;
+                        expect(err.name).to.equal('Error');
+                        expect(res).to.be.undefined;
+                        done();
+                    });
+                });
+            });
+
+
+            /* testImplicitException */
+            describe('testImplicitException', function() {
+                var arg = 'abc';
+
+                it('rpc should not have callback error argument set', function(done) {
+                    side.rpcCall('testImplicitException', [arg], function(err, res) {
+                        expect(err).to.equal(null);
+                        expect(res).to.equal( 3);
+                        done();
+                    });
+                });
+
+                it('rpc should have error argument in callback set', function(done) {
+                    side.rpcCall('testImplicitException', [null], function(err, res) {
+                        expect(err).not.to.be.null;
+                        expect(err.name).to.equal('TypeError');
+                        expect(res).to.be.undefined;
+                        done();
+                    });
+                });
+            });
+
+
+            /* testImplicitExceptionEvalError */
+            it('EvalError', function(done) {
+                side.rpcCall('testImplicitExceptionEvalError', [], function(err, res) {
                     expect(err).not.to.be.null;
+                    expect(err.name).to.equal('EvalError');
+                    expect(res).to.be.undefined;
+                    done();
+                });
+            });
+            
+
+            /* testImplicitExceptionRangeError */
+            it('RangeError', function(done) {
+                side.rpcCall('testImplicitExceptionRangeError', [], function(err, res) {
+                    expect(err).not.to.be.null;
+                    expect(err.name).to.equal('RangeError');
+                    expect(res).to.be.undefined;
+                    done();
+                });
+            });
+            
+
+            /* testImplicitExceptionReferenceError */
+            it('ReferenceError', function(done) {
+                side.rpcCall('testImplicitExceptionReferenceError', [], function(err, res) {
+                    expect(err).not.to.be.null;
+                    expect(err.name).to.equal('ReferenceError');
                     expect(res).to.be.undefined;
                     done();
                 });
             });
 
-            it('rpc should have error argument in callback set', function(done) {
-                side.rpcCall('testExplicitException', [arg], function(err, res) {
+
+            /* testImplicitExceptionSyntaxError */
+            it('SyntaxError', function(done) {
+                side.rpcCall('testImplicitExceptionSyntaxError', [], function(err, res) {
                     expect(err).not.to.be.null;
+                    expect(err.name).to.equal('SyntaxError');
                     expect(res).to.be.undefined;
                     done();
                 });
             });
+
+
+            /* testImplicitExceptionTypeError */
+            it('TypeError', function(done) {
+                side.rpcCall('testImplicitExceptionTypeError', [], function(err, res) {
+                    expect(err).not.to.be.null;
+                    expect(err.name).to.equal('TypeError');
+                    expect(res).to.be.undefined;
+                    done();
+                });
+            });
+
+
+            /* testImplicitExceptionURIError */
+            it('URIError', function(done) {
+                side.rpcCall('testImplicitExceptionURIError', [], function(err, res) {
+                    expect(err).not.to.be.null;
+                    expect(err.name).to.equal('URIError');
+                    expect(res).to.be.undefined;
+                    done();
+                });
+            });
+
         });
-
-
-        /* testImplicitException */
-        describe('testImplicitException', function() {
-            var arg = 'abc';
-
-            it('rpc should not have callback error argument set', function(done) {
-                side.rpcCall('testImplicitException', [arg], function(err, res) {
-                    expect(err).to.equal(null);
-                    expect(res).to.equal( 3);
-                    done();
-                });
-            });
-
-            it('rpc should have error argument in callback set', function(done) {
-                side.rpcCall('testImplicitException', [null], function(err, res) {
-                    expect(err).not.to.be.null;
-                    expect(res).to.be.undefined;
-                    done();
-                });
-            });
-        });
-
 
         /* test undefined function */
         describe('test undefined function', function() {

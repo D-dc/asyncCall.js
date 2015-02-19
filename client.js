@@ -34,7 +34,21 @@ var c = 3;
 callServer = function() {
     console.log(" callServer called")
     myClient.rpcCall("testRemote", [a, b, c], function(err, res) {
-        console.log("callServer reply " + res, err);
+        console.log(" reply " + res, err);
+    });
+}
+
+callServerInexist = function() {
+    console.log(" callServerInexist called")
+    myClient.rpcCall("testNon exists", [a, b, c], function(err, res) {
+        console.log(" reply " + res, err);
+    });
+}
+
+callServerTriggerException = function() {
+    console.log(" triggerException called")
+    myClient.rpcCall("triggerException", [], function(err, res) {
+        console.log(" reply " + res, err);
     });
 }
 
@@ -42,8 +56,8 @@ callServer = function() {
     CallServer with Due: keep waiting until due elapsed
 */
 callServerDue = function() {
-    console.log(" callServer called")
+    console.log(" callServerDue called")
     myClient.rpcCall("testRemote", [a, b, c], function(err, res) {
-        console.log("callServer reply " + res, err);
-    },2);
+        console.log(" reply " + res, err);
+    }, 2);
 }
