@@ -302,7 +302,7 @@ var tests = function(side, info){
             it('rpc should return sum', function(done) {
                 side.rpcCall('testFuncSum', [arg1, arg1], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( arg1 + arg1);
+                    expect(res).to.equal(arg1 + arg1);
                     done();
                 });
             });
@@ -310,7 +310,7 @@ var tests = function(side, info){
             it('rpc should accept fewer arguments', function(done) {
                 side.rpcCall('testFuncSum', [arg1], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( null);
+                    expect(res).to.equal(null);
                     done();
                 });
             });
@@ -318,7 +318,7 @@ var tests = function(side, info){
             it('rpc should return sum', function(done) {
                 side.rpcCall('testFuncSum', [null, arg1], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( arg1);
+                    expect(res).to.equal(arg1);
                     done();
                 });
             });
@@ -326,7 +326,7 @@ var tests = function(side, info){
             it('rpc should return sum', function(done) {
                 side.rpcCall('testFuncSum', [null, arg2], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( arg2);
+                    expect(res).to.equal(arg2);
                     done();
                 });
             });
@@ -340,7 +340,7 @@ var tests = function(side, info){
             it('rpc should return incremented argument', function(done) {
                 side.rpcCall('testFuncIncrement', [arg], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( arg + 1);
+                    expect(res).to.equal(arg + 1);
                     done();
                 });
             });
@@ -348,7 +348,7 @@ var tests = function(side, info){
             it('rpc should return incremented argument', function(done) {
                 side.rpcCall('testFuncIncrement', [arg2], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( arg2 + 1);
+                    expect(res).to.equal(arg2 + 1);
                     done();
                 });
             });
@@ -356,7 +356,7 @@ var tests = function(side, info){
             it('rpc should ignore too many arguments', function(done) {
                 side.rpcCall('testFuncIncrement', [arg, 2], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( arg + 1);
+                    expect(res).to.equal(arg + 1);
                     done();
                 });
             });
@@ -565,6 +565,15 @@ var tests = function(side, info){
                 }, 500);
             });
 
+            it('rpc should not timeout', function(done) {
+                this.timeout(1500);
+                side.rpcCall('testSlowComputation', [], function(err, res) {
+                    expect(err).to.be.null;
+                    expect(res).to.equal(true);
+                    done();
+                }, 1500);
+            }); 
+
             it('rpc should timeout', function(done) {
                 this.timeout(1200);
                 side.rpcCall('testSlowComputation', [], function(err, res) {
@@ -595,6 +604,16 @@ var tests = function(side, info){
                     done();
                 }, 1);
             });
+
+            it('rpc timout should remove it from openCalls', function(done) {
+                this.timeout(300);
+                var fixDate = new Date();
+                side.rpcCall('testFuncNoReturn', [], function(err, res) {
+                    expect(Object.keys(myClient.RPC.openCalls).length).to.equal(0);
+                    done();
+                }, 1);
+            });
+            
 
             it('rpc should timout immediately', function(done) {
                 this.timeout(400);
