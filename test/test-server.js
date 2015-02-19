@@ -80,16 +80,7 @@ myServer.expose({
         g++;
         return g;
     }
-    /*
-    Error – base type for all errors. Never actually thrown by the engine.
-EvalError – thrown when an error occurs during execution of code via eval()
-RangeError – thrown when a number is outside the bounds of its range. For example, trying to create an array with -20 items (new Array(-20)). These occur rarely during normal execution.
-ReferenceError – thrown when an object is expected but not available, for instance, trying to call a method on a null reference.
-SyntaxError – thrown when the code passed into eval() has a syntax error.
-TypeError – thrown when a variable is of an unexpected type. For example, new 10 or "prop" in true.
-URIError – thrown when an incorrectly formatted URI string is passed into encodeURI, encodeURIComponent, decodeURI, or decodeURIComponent.
 
-    */
 });
 
 module.exports = myServer;

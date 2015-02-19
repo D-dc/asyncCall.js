@@ -7,6 +7,7 @@ var myServer = require('./test-server.js'),
 
 myClient = new ClientRpc('http://127.0.0.1:8123');
 myClient2 = new ClientRpc('http://127.0.0.1:8123');
+myClient3 = new ClientRpc('http://127.0.0.1:8123');
 
 g=0;
 myClient.expose({
@@ -54,30 +55,85 @@ myClient.expose({
 
 
 describe('general tests', function() {
-    it('openCalls parameters should be correct', function(done) {
-            this.exposedFunctions = [];
-            var c = myClient.RPC;          
-            expect(c.openCalls.length).to.equal(0);
+    it('openCalls parameters should remove calls on invoking callback', function(done) {
+        this.exposedFunctions = [];
+        var c = myClient.RPC; 
+        myClient.rpcCall('testFuncNoArgs', [], function(err, res){
+            expect(Object.keys(c.openCalls).length).to.equal(0);
             done();
+        });           
+    });
+
+    it('openCalls parameters should remove calls on invoking callback', function(done) {
+        this.exposedFunctions = [];
+        var c = myClient.RPC; 
+        myClient.rpcCall('testFuncNoArgs', [], function(err, res){
+            myClient.rpcCall('testFuncNoArgs', [], function(err, res){
+                myClient.rpcCall('testFuncNoArgs', [], function(err, res){
+                expect(Object.keys(c.openCalls).length).to.equal(0);
+                done();
+                });
+            });
+        });           
+    });
+
+    it('openCalls parameters should remove calls on invoking callback with exception', function(done) {
+        this.exposedFunctions = [];
+        var c = myClient.RPC; 
+        myClient.rpcCall('testExplicitException', [], function(err, res){
+            expect(Object.keys(c.openCalls).length).to.equal(0);
+            done();
+        });           
+    });
+
+    it('openCalls parameters should remove calls on invoking callback with exception', function(done) {
+        this.exposedFunctions = [];
+        var c = myClient.RPC; 
+        myClient.rpcCall('testExplicitException', [], function(err, res){
+            myClient.rpcCall('testExplicitException', [], function(err, res){
+                myClient.rpcCall('testExplicitException', [], function(err, res){
+                expect(Object.keys(c.openCalls).length).to.equal(0);
+                done();
+                });
+            });
+        });           
     });
 
     it('openCalls parameters should be correct', function(done) {
-            this.exposedFunctions = [];
-            var c = myClient.RPC;
-            myClient.rpcCall('nonexist');
-            expect(c.openCalls.length).to.equal(1);
-            done();
+        this.exposedFunctions = [];
+        var c = myClient.RPC;          
+        expect(Object.keys(c.openCalls).length).to.equal(0);
+        done();
     });
 
     it('openCalls parameters should be correct', function(done) {
-            this.exposedFunctions = [];
-            var c = myClient2.RPC;
-            myClient2.rpcCall('nonexist');
-            myClient2.rpcCall('nonexist');
-            myClient2.rpcCall('nonexist');
-            expect(c.openCalls.length).to.equal(3);
-            done();
+        this.exposedFunctions = [];
+        var c = myClient.RPC;
+        myClient.rpcCall('nonexist');
+        expect(Object.keys(c.openCalls).length).to.equal(1);
+        done();
     });
+
+    it('openCalls parameters should be correct', function(done) {
+        this.exposedFunctions = [];
+        var c = myClient2.RPC;
+        myClient2.rpcCall('nonexist');
+        myClient2.rpcCall('nonexist');
+        myClient2.rpcCall('nonexist');
+        expect(Object.keys(c.openCalls).length).to.equal(3);
+        done();
+    });
+
+    it('openCalls parameters should be correct', function(done) {
+        this.exposedFunctions = [];
+        var c = myClient3.RPC;
+        myClient3.rpcCall('testFuncNoArgs', [], function(err, res){
+            myClient3.rpcCall('nonexist');
+            expect(Object.keys(c.openCalls).length).to.equal(1);
+            done();
+        });
+    });
+
 
 });
 
@@ -501,11 +557,20 @@ var tests = function(side, info){
         /* test undefined function */
         describe('test for @due', function() {
 
+             it('rpc should not timeout even when due set', function(done) {
+                this.timeout(700);
+                side.rpcCall('testFuncNoArgs', [], function(err, res) {
+                    expect(res).not.to.be.null;
+                    done();
+                }, 500);
+            });
+
             it('rpc should timeout', function(done) {
                 this.timeout(1200);
                 side.rpcCall('testSlowComputation', [], function(err, res) {
                     expect(err).not.to.be.null;
-                    expect(res).to.equal( undefined);
+                    expect(err.name).to.equal('Error');
+                    expect(res).to.equal(undefined);
                     done();
                 }, 1000);
             });
@@ -515,17 +580,35 @@ var tests = function(side, info){
                 var fixDate = new Date();
                 side.rpcCall('testSlowComputation', [], function(err, res) {
                     var now =  new Date();
-                    assert.strictEqual((now-fixDate<1500), true);
+                    assert.strictEqual((now-fixDate<1200), true);
                     done();
                 }, 1000);
             });
 
-            it('rpc should fail immediately', function(done) {
-                this.timeout(25);
+            it('rpc should timout immediately', function(done) {
+                this.timeout(300);
                 var fixDate = new Date();
                 side.rpcCall('testFuncNoReturn', [], function(err, res) {
+                    expect(err).not.to.be.null;
+                    expect(err.name).to.equal('Error');
+                    expect(res).to.equal(undefined);
                     done();
                 }, 1);
+            });
+
+            it('rpc should timout immediately', function(done) {
+                this.timeout(400);
+                var fixDate = new Date();
+                side.rpcCall('testFuncNoArgs', [], function(err, res) {
+                    expect(res).not.to.be.null;
+                });    
+                side.rpcCall('testFuncNoReturn', [], function(err, res) {
+                    expect(err).not.to.be.null;
+                    expect(err.name).to.equal('Error');
+                    expect(res).to.equal(undefined);
+                    done();
+                }, 1);
+                    
             });
 
         });
