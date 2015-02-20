@@ -1,15 +1,13 @@
-
 var myServer = require('./test-server.js'),
     ClientRpc = require('../lib/rpc_client.js'),
     assert = require("assert"),
     expect = require('chai').expect;
 
-
 myClient = new ClientRpc('http://127.0.0.1:8123');
 myClient2 = new ClientRpc('http://127.0.0.1:8123');
 myClient3 = new ClientRpc('http://127.0.0.1:8123');
 
-g=0;
+g = 0;
 myClient.expose({
     'testFuncNoArgs': function() {
         return true;
@@ -20,7 +18,7 @@ myClient.expose({
     'testFuncTwoArg': function(a, b) {
         return a + b;
     },
-    'testFuncArgumentsVar': function(a){
+    'testFuncArgumentsVar': function(a) {
         return Array.prototype.slice.call(arguments);;
     },
     'testFuncNoReturn': function() {
@@ -49,59 +47,56 @@ myClient.expose({
     }
 });
 
-
 // TESTS
-
-
 
 describe('general tests', function() {
     it('openCalls parameters should remove calls on invoking callback', function(done) {
         this.exposedFunctions = [];
-        var c = myClient.RPC; 
-        myClient.rpcCall('testFuncNoArgs', [], function(err, res){
+        var c = myClient.RPC;
+        myClient.rpcCall('testFuncNoArgs', [], function(err, res) {
             expect(Object.keys(c.openCalls).length).to.equal(0);
             done();
-        });           
+        });
     });
 
     it('openCalls parameters should remove calls on invoking callback', function(done) {
         this.exposedFunctions = [];
-        var c = myClient.RPC; 
-        myClient.rpcCall('testFuncNoArgs', [], function(err, res){
-            myClient.rpcCall('testFuncNoArgs', [], function(err, res){
-                myClient.rpcCall('testFuncNoArgs', [], function(err, res){
-                expect(Object.keys(c.openCalls).length).to.equal(0);
-                done();
+        var c = myClient.RPC;
+        myClient.rpcCall('testFuncNoArgs', [], function(err, res) {
+            myClient.rpcCall('testFuncNoArgs', [], function(err, res) {
+                myClient.rpcCall('testFuncNoArgs', [], function(err, res) {
+                    expect(Object.keys(c.openCalls).length).to.equal(0);
+                    done();
                 });
             });
-        });           
+        });
     });
 
     it('openCalls parameters should remove calls on invoking callback with exception', function(done) {
         this.exposedFunctions = [];
-        var c = myClient.RPC; 
-        myClient.rpcCall('testExplicitException', [], function(err, res){
+        var c = myClient.RPC;
+        myClient.rpcCall('testExplicitException', [], function(err, res) {
             expect(Object.keys(c.openCalls).length).to.equal(0);
             done();
-        });           
+        });
     });
 
     it('openCalls parameters should remove calls on invoking callback with exception', function(done) {
         this.exposedFunctions = [];
-        var c = myClient.RPC; 
-        myClient.rpcCall('testExplicitException', [], function(err, res){
-            myClient.rpcCall('testExplicitException', [], function(err, res){
-                myClient.rpcCall('testExplicitException', [], function(err, res){
-                expect(Object.keys(c.openCalls).length).to.equal(0);
-                done();
+        var c = myClient.RPC;
+        myClient.rpcCall('testExplicitException', [], function(err, res) {
+            myClient.rpcCall('testExplicitException', [], function(err, res) {
+                myClient.rpcCall('testExplicitException', [], function(err, res) {
+                    expect(Object.keys(c.openCalls).length).to.equal(0);
+                    done();
                 });
             });
-        });           
+        });
     });
 
     it('openCalls parameters should be correct', function(done) {
         this.exposedFunctions = [];
-        var c = myClient.RPC;          
+        var c = myClient.RPC;
         expect(Object.keys(c.openCalls).length).to.equal(0);
         done();
     });
@@ -127,22 +122,19 @@ describe('general tests', function() {
     it('openCalls parameters should be correct', function(done) {
         this.exposedFunctions = [];
         var c = myClient3.RPC;
-        myClient3.rpcCall('testFuncNoArgs', [], function(err, res){
+        myClient3.rpcCall('testFuncNoArgs', [], function(err, res) {
             myClient3.rpcCall('nonexist');
             expect(Object.keys(c.openCalls).length).to.equal(1);
             done();
         });
     });
 
-
 });
 
-
-var tests = function(side, info){
-    
+var tests = function(side, info) {
 
     describe(info, function() {
-        
+
         /* testFuncNoArgs */
         describe('testFuncNoArgs', function() {
             it('rpc should return true', function(done) {
@@ -153,7 +145,6 @@ var tests = function(side, info){
                 });
             });
 
-
             it('rpc should accept arguments', function(done) {
                 side.rpcCall('testFuncNoArgs', [1, 2, 3], function(err, res) {
                     expect(err).to.equal(null);
@@ -162,7 +153,6 @@ var tests = function(side, info){
                 });
             });
         });
-
 
         /* testFuncSingleArg */
         describe('testFuncSingleArg', function() {
@@ -186,13 +176,12 @@ var tests = function(side, info){
             it('rpc should ignore too many arguments', function(done) {
                 side.rpcCall('testFuncSingleArg', [arg, 2], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( arg);
+                    expect(res).to.equal(arg);
                     done();
                 });
             });
 
         });
-
 
         /* testFuncTwoArg */
         describe('testFuncTwoArg', function() {
@@ -201,7 +190,7 @@ var tests = function(side, info){
             it('rpc should return the concat', function(done) {
                 side.rpcCall('testFuncTwoArg', [arg1, arg2], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( (arg1 + arg2));
+                    expect(res).to.equal((arg1 + arg2));
                     done();
                 });
             });
@@ -211,7 +200,7 @@ var tests = function(side, info){
             it('rpc should return the sum', function(done) {
                 side.rpcCall('testFuncTwoArg', [arg1, arg2], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( (arg1 + arg2));
+                    expect(res).to.equal((arg1 + arg2));
                     done();
                 });
             });
@@ -219,7 +208,7 @@ var tests = function(side, info){
             it('rpc should accept no arguments', function(done) {
                 side.rpcCall('testFuncTwoArg', [], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( null);
+                    expect(res).to.equal(null);
                     done();
                 });
             });
@@ -227,12 +216,11 @@ var tests = function(side, info){
             it('rpc should ignore too many arguments', function(done) {
                 side.rpcCall('testFuncTwoArg', [arg1, arg2, arg2], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( (arg1 + arg2));
+                    expect(res).to.equal((arg1 + arg2));
                     done();
                 });
             });
         });
-
 
         /* testFuncArgumentsVar*/
         describe('testFuncArgumentsVar', function() {
@@ -255,7 +243,6 @@ var tests = function(side, info){
             });
         });
 
-
         /* testFuncNoReturn*/
         describe('testFuncNoReturn', function() {
             var arg1 = 'a';
@@ -263,7 +250,7 @@ var tests = function(side, info){
             it('rpc should accept no arguments', function(done) {
                 side.rpcCall('testFuncNoReturn', [], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( undefined);
+                    expect(res).to.equal(undefined);
                     done();
                 });
             });
@@ -271,7 +258,7 @@ var tests = function(side, info){
             it('rpc should accept 1 argument', function(done) {
                 side.rpcCall('testFuncNoReturn', [arg1], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( undefined);
+                    expect(res).to.equal(undefined);
                     done();
                 });
             });
@@ -279,13 +266,12 @@ var tests = function(side, info){
             it('rpc should accept 2 arguments', function(done) {
                 side.rpcCall('testFuncNoReturn', [arg1, arg2], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( undefined);
+                    expect(res).to.equal(undefined);
                     done();
                 });
             });
 
         });
-
 
         /* testFuncSum*/
         describe('testFuncSum', function() {
@@ -294,7 +280,7 @@ var tests = function(side, info){
             it('rpc should return sum', function(done) {
                 side.rpcCall('testFuncSum', [arg1, arg2], function(err, res) {
                     expect(err).to.equal(null);
-                    expect(res).to.equal( arg1 + arg2);
+                    expect(res).to.equal(arg1 + arg2);
                     done();
                 });
             });
@@ -331,7 +317,6 @@ var tests = function(side, info){
                 });
             });
         });
-
 
         /* testFuncIncrement */
         describe('testFuncIncrement', function() {
@@ -400,7 +385,6 @@ var tests = function(side, info){
                 });
             });
 
-
             /* testImplicitException */
             describe('testImplicitException', function() {
                 var arg = 'abc';
@@ -408,7 +392,7 @@ var tests = function(side, info){
                 it('rpc should not have callback error argument set', function(done) {
                     side.rpcCall('testImplicitException', [arg], function(err, res) {
                         expect(err).to.equal(null);
-                        expect(res).to.equal( 3);
+                        expect(res).to.equal(3);
                         done();
                     });
                 });
@@ -423,7 +407,6 @@ var tests = function(side, info){
                 });
             });
 
-
             /* testImplicitExceptionEvalError */
             it('EvalError', function(done) {
                 side.rpcCall('testImplicitExceptionEvalError', [], function(err, res) {
@@ -433,7 +416,6 @@ var tests = function(side, info){
                     done();
                 });
             });
-            
 
             /* testImplicitExceptionRangeError */
             it('RangeError', function(done) {
@@ -444,7 +426,6 @@ var tests = function(side, info){
                     done();
                 });
             });
-            
 
             /* testImplicitExceptionReferenceError */
             it('ReferenceError', function(done) {
@@ -456,7 +437,6 @@ var tests = function(side, info){
                 });
             });
 
-
             /* testImplicitExceptionSyntaxError */
             it('SyntaxError', function(done) {
                 side.rpcCall('testImplicitExceptionSyntaxError', [], function(err, res) {
@@ -467,7 +447,6 @@ var tests = function(side, info){
                 });
             });
 
-
             /* testImplicitExceptionTypeError */
             it('TypeError', function(done) {
                 side.rpcCall('testImplicitExceptionTypeError', [], function(err, res) {
@@ -477,7 +456,6 @@ var tests = function(side, info){
                     done();
                 });
             });
-
 
             /* testImplicitExceptionURIError */
             it('URIError', function(done) {
@@ -496,21 +474,19 @@ var tests = function(side, info){
             it('rpc should have error argument set', function(done) {
                 side.rpcCall('testFuncUndefined', [], function(err, res) {
                     expect(err).not.to.be.null;
-                    expect(res).to.equal( undefined);
+                    expect(res).to.equal(undefined);
                     done();
                 });
             });
-
 
             it('rpc should have error argument set', function(done) {
                 side.rpcCall('testFuncUndefined', [1, 2, 3], function(err, res) {
                     expect(err).not.to.be.null;
-                    expect(res).to.equal( undefined);
+                    expect(res).to.equal(undefined);
                     done();
                 });
             });
         });
-
 
         /* test program var */
         describe('test program var sequential', function() {
@@ -557,7 +533,7 @@ var tests = function(side, info){
         /* test undefined function */
         describe('test for @due', function() {
 
-             it('rpc should not timeout even when due set', function(done) {
+            it('rpc should not timeout even when due set', function(done) {
                 this.timeout(700);
                 side.rpcCall('testFuncNoArgs', [], function(err, res) {
                     expect(res).not.to.be.null;
@@ -572,7 +548,7 @@ var tests = function(side, info){
                     expect(res).to.equal(true);
                     done();
                 }, 1500);
-            }); 
+            });
 
             it('rpc should timeout', function(done) {
                 this.timeout(1200);
@@ -588,8 +564,8 @@ var tests = function(side, info){
                 this.timeout(1200);
                 var fixDate = new Date();
                 side.rpcCall('testSlowComputation', [], function(err, res) {
-                    var now =  new Date();
-                    assert.strictEqual((now-fixDate<1200), true);
+                    var now = new Date();
+                    assert.strictEqual((now - fixDate < 1200), true);
                     done();
                 }, 1000);
             });
@@ -613,21 +589,20 @@ var tests = function(side, info){
                     done();
                 }, 1);
             });
-            
 
             it('rpc should timout immediately', function(done) {
                 this.timeout(400);
                 var fixDate = new Date();
                 side.rpcCall('testFuncNoArgs', [], function(err, res) {
                     expect(res).not.to.be.null;
-                });    
+                });
                 side.rpcCall('testFuncNoReturn', [], function(err, res) {
                     expect(err).not.to.be.null;
                     expect(err.name).to.equal('Error');
                     expect(res).to.equal(undefined);
                     done();
                 }, 1);
-                    
+
             });
 
         });
@@ -638,6 +613,5 @@ var tests = function(side, info){
 
 //Run the tests from both sides
 tests(myClient, 'From Client RPC to server');
-
 
 //TODO bidirectional tests

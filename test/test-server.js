@@ -9,16 +9,16 @@ serverHttp.listen(port, function() {
 });
 app.use("/", express.static(__dirname + '/'));
 
-
-function simulateSlowComputation(millis){
-	var fixDate = new Date();
-	var current = null;
-	do { current = new Date(); }
-	while(current-fixDate < millis);
+function simulateSlowComputation(millis) {
+    var fixDate = new Date();
+    var current = null;
+    do {
+        current = new Date();
+    }
+    while (current - fixDate < millis);
 };
 
-
-var g=0;
+var g = 0;
 var myServer = new ServerRpc(serverHttp);
 myServer.expose({
     'testFuncNoArgs': function() {
@@ -30,7 +30,7 @@ myServer.expose({
     'testFuncTwoArg': function(a, b) {
         return a + b;
     },
-    'testFuncArgumentsVar': function(a){
+    'testFuncArgumentsVar': function(a) {
         return Array.prototype.slice.call(arguments);
     },
     'testFuncNoReturn': function() {
