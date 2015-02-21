@@ -1,5 +1,6 @@
 var myServer = require('./test-server.js'),
     ClientRpc = require('../lib/rpc_client.js'),
+    Lease = require('../lib/lease.js'),
     assert = require("assert"),
     expect = require('chai').expect;
 
@@ -48,6 +49,7 @@ myClient.expose({
 });
 
 // TESTS
+
 
 describe('general tests', function() {
     it('openCalls parameters should remove calls on invoking callback', function(done) {
@@ -570,20 +572,8 @@ var tests = function(side, info) {
                 }, 1000);
             });
 
-            it('rpc should timout immediately', function(done) {
-                this.timeout(300);
-                var fixDate = new Date();
-                side.rpcCall('testFuncNoReturn', [], function(err, res) {
-                    expect(err).not.to.be.null;
-                    expect(err.name).to.equal('Error');
-                    expect(res).to.equal(undefined);
-                    done();
-                }, 1);
-            });
-
             it('rpc timout should remove it from openCalls', function(done) {
                 this.timeout(300);
-                var fixDate = new Date();
                 side.rpcCall('testFuncNoReturn', [], function(err, res) {
                     expect(Object.keys(myClient.RPC.openCalls).length).to.equal(0);
                     done();
@@ -592,7 +582,6 @@ var tests = function(side, info) {
 
             it('rpc should timout immediately', function(done) {
                 this.timeout(400);
-                var fixDate = new Date();
                 side.rpcCall('testFuncNoArgs', [], function(err, res) {
                     expect(res).not.to.be.null;
                 });
@@ -612,6 +601,6 @@ var tests = function(side, info) {
 };
 
 //Run the tests from both sides
-tests(myClient, 'From Client RPC to server');
+tests(myClient, 'RPC tests');
 
 //TODO bidirectional tests

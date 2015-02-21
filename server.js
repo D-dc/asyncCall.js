@@ -9,8 +9,20 @@ serverHttp.listen(port, function() {
 });
 app.use("/", express.static(__dirname + '/'));
 
-var c=1;
-var myServer = new ServerRpc(serverHttp);
+var c = 1;
+
+var options = {
+        //heartbeat
+        pingTimeout: 6000, //timeout from client to receive new heartbeat from server (value shipped to client)
+        pingInterval: 2500, //timeout when server should send heartbeat to client
+        //Custom
+        defaultReplyTimeOut: Infinity //default delay before an RPC call should have its reply. Infinity = no timeout
+        
+    };
+
+var myServer = new ServerRpc(serverHttp, options);
+
+
 myServer.expose({
      'testRemote': function(a, b) {
          //excess arguments are accessible via 'arguments'
@@ -33,10 +45,26 @@ myServer.expose({
         var d;
         d.getA;
      }
- });
+});
 
 
-var d=0;
+var d = 0;
+
+
+myServer.onConnection(function(){
+
+    callClient = function() {
+        console.log("testClient " + d);
+        myServer.rpcCall("testClient", [d], function(err, res) {
+            console.log("testClient reply " + d);
+            d++;
+            
+        });
+        setTimeout(function(){callClient();}, 5000);
+    }
+    callClient();
+
+});
 
 
 /*var e =0;
@@ -54,24 +82,3 @@ callClientFast = function() {
 
 setTimeout(function(){callClientFast();}, 10000);;*/
 //console.log("testClient")
-
-myServer.onConnection(function(){
-
-    /*myServer.rpcCall("testClient", [d], function(err, res) {
-        console.log("testClient reply " + d);
-        d++;
-    });*/
-
-    
-
-    callClient = function() {
-        console.log("testClient " + d);
-        myServer.rpcCall("testClient", [d], function(err, res) {
-            console.log("testClient reply " + d);
-            d++;
-            
-        });
-        setTimeout(function(){callClient();}, 5000);
-    }
-    callClient();
-});
