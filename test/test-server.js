@@ -1,8 +1,11 @@
 var express = require('express'),
     app = express(),
     serverHttp = require('http').createServer(app),
-    ServerRpc = require('../lib/rpc_server.js'),
-    port = 8123;
+    ServerRpc = require('../lib/rpc-server.js'),
+    ClientRpc = require('../lib/rpc-client.js'),
+    port = 8123,
+    assert = require("assert"),
+    expect = require('chai').expect;
 
 serverHttp.listen(port, function() {
     console.log('Server listening at port %d', port);
@@ -20,7 +23,8 @@ function simulateSlowComputation(millis) {
 
 var g = 0;
 var myServer = new ServerRpc(serverHttp);
-myServer.expose({
+var methods = 
+    {
     'testFuncNoArgs': function() {
         return true;
     },
@@ -80,7 +84,26 @@ myServer.expose({
         g++;
         return g;
     }
+    };
+var methodCount = Object.keys(methods).length    
 
-});
+myServer.expose(methods);
 
 module.exports = myServer;
+
+
+
+describe('ServerRpc tests', function() {
+    it('exposed methods', function(done) {
+        expect(Object.keys(myServer.exposedFunctions).length).to.be.equal(methodCount);
+        for(m in methods){
+            expect(myServer.exposedFunctions[m]).not.to.be.undefined;
+        }
+        done();
+    });
+
+//TODO
+
+
+});    
+

@@ -1,137 +1,16 @@
 var myServer = require('./test-server.js'),
-    ClientRpc = require('../lib/rpc_client.js'),
+    ClientRpc = require('../lib/rpc-client.js'),
     Lease = require('../lib/lease.js'),
     assert = require("assert"),
     expect = require('chai').expect;
 
 myClient = new ClientRpc('http://127.0.0.1:8123');
-myClient2 = new ClientRpc('http://127.0.0.1:8123');
-myClient3 = new ClientRpc('http://127.0.0.1:8123');
+
 
 g = 0;
-myClient.expose({
-    'testFuncNoArgs': function() {
-        return true;
-    },
-    'testFuncSingleArg': function(a) {
-        return a;
-    },
-    'testFuncTwoArg': function(a, b) {
-        return a + b;
-    },
-    'testFuncArgumentsVar': function(a) {
-        return Array.prototype.slice.call(arguments);;
-    },
-    'testFuncNoReturn': function() {
-
-    },
-    'testFuncSum': function(a, b) {
-        return a + b;
-    },
-    'testFuncIncrement': function(a) {
-        a++;
-        return a;
-    },
-    'testExplicitException': function() {
-        throw new Error('Explicit exception!')
-    },
-    'testImplicitException': function(b) {
-        return b.length;
-    },
-    'testSlowComputation': function() {
-        simulateSlowComputation(1000); //take some time to give reply
-        return true;
-    },
-    'testProgVar': function() {
-        g++;
-        return g;
-    }
-});
+myClient.expose({});
 
 // TESTS
-
-
-describe('general tests', function() {
-    it('openCalls parameters should remove calls on invoking callback', function(done) {
-        this.exposedFunctions = [];
-        var c = myClient.RPC;
-        myClient.rpcCall('testFuncNoArgs', [], function(err, res) {
-            expect(Object.keys(c.openCalls).length).to.equal(0);
-            done();
-        });
-    });
-
-    it('openCalls parameters should remove calls on invoking callback', function(done) {
-        this.exposedFunctions = [];
-        var c = myClient.RPC;
-        myClient.rpcCall('testFuncNoArgs', [], function(err, res) {
-            myClient.rpcCall('testFuncNoArgs', [], function(err, res) {
-                myClient.rpcCall('testFuncNoArgs', [], function(err, res) {
-                    expect(Object.keys(c.openCalls).length).to.equal(0);
-                    done();
-                });
-            });
-        });
-    });
-
-    it('openCalls parameters should remove calls on invoking callback with exception', function(done) {
-        this.exposedFunctions = [];
-        var c = myClient.RPC;
-        myClient.rpcCall('testExplicitException', [], function(err, res) {
-            expect(Object.keys(c.openCalls).length).to.equal(0);
-            done();
-        });
-    });
-
-    it('openCalls parameters should remove calls on invoking callback with exception', function(done) {
-        this.exposedFunctions = [];
-        var c = myClient.RPC;
-        myClient.rpcCall('testExplicitException', [], function(err, res) {
-            myClient.rpcCall('testExplicitException', [], function(err, res) {
-                myClient.rpcCall('testExplicitException', [], function(err, res) {
-                    expect(Object.keys(c.openCalls).length).to.equal(0);
-                    done();
-                });
-            });
-        });
-    });
-
-    it('openCalls parameters should be correct', function(done) {
-        this.exposedFunctions = [];
-        var c = myClient.RPC;
-        expect(Object.keys(c.openCalls).length).to.equal(0);
-        done();
-    });
-
-    it('openCalls parameters should be correct', function(done) {
-        this.exposedFunctions = [];
-        var c = myClient.RPC;
-        myClient.rpcCall('nonexist');
-        expect(Object.keys(c.openCalls).length).to.equal(1);
-        done();
-    });
-
-    it('openCalls parameters should be correct', function(done) {
-        this.exposedFunctions = [];
-        var c = myClient2.RPC;
-        myClient2.rpcCall('nonexist');
-        myClient2.rpcCall('nonexist');
-        myClient2.rpcCall('nonexist');
-        expect(Object.keys(c.openCalls).length).to.equal(3);
-        done();
-    });
-
-    it('openCalls parameters should be correct', function(done) {
-        this.exposedFunctions = [];
-        var c = myClient3.RPC;
-        myClient3.rpcCall('testFuncNoArgs', [], function(err, res) {
-            myClient3.rpcCall('nonexist');
-            expect(Object.keys(c.openCalls).length).to.equal(1);
-            done();
-        });
-    });
-
-});
 
 var tests = function(side, info) {
 
@@ -600,7 +479,6 @@ var tests = function(side, info) {
 
 };
 
-//Run the tests from both sides
 tests(myClient, 'RPC tests');
 
 //TODO bidirectional tests
