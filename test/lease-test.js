@@ -8,7 +8,7 @@ var Lease = require('../lib/lease.js'),
 
 function testTimeBetween(dateA, dateB, minDiff, maxDiff) {
     var diff = Math.abs(dateA.getTime() - dateB.getTime());
-    console.log(diff)
+
     if (diff > minDiff && diff < maxDiff)
         return true;
 
