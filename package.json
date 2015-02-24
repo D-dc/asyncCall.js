@@ -1,8 +1,8 @@
 {
-  "name": "RPC-Leases",
-  "version": "0.0.0",
-  "description": "",
-  "main": "rpc_server.js",
+  "name": "rpc-leases",
+  "version": "0.0.1",
+  "description": "An RPC library.",
+  "main": "index.js",
   "author": "Diel Caroes",
   "private": true,
   "license": "BSD",
@@ -16,6 +16,25 @@
     "supertest": "0.8.2"
   },
   "scripts": {
-    "test": "mocha"
-  }
+    "test": "mocha",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dielc/lease-rpc"
+  },
+  "bugs": {
+    "url": "https://github.com/dielc/lease-rpc/issues"
+  },
+  "homepage": "https://github.com/dielc/lease-rpc",
+  "directories": {
+    "example": "example",
+    "test": "test"
+  },
+  "keywords": [
+    "rpc",
+    "rmi",
+    "lease",
+    "socket.io"
+  ]
 }

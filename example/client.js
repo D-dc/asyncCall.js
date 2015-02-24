@@ -8,8 +8,8 @@ var options =  {
         randomizationFactor: 0.5,
         timeout: 2000, //time before connect_error, connect_timeout events
         autoConnect: true, //automatically connect
-        //CUSTOM
-        defaultRpcTimeout: Infinity //default delay before an RPC call should have its reply. Infinity = no timeout
+        defaultRpcTimeout: Infinity, //default delay before an RPC call should have its reply. Infinity = no timeout
+        leaseRenewOnExpire: true
     };
 
 
@@ -25,6 +25,45 @@ myClient.expose({
             myClient.rpcCall('pong', [ctr]);
         }, 2000);
     }
+});
+
+//EVENTS called on client side
+myClient.on('connect', function() {
+    console.log('connect');
+}); // on connected (CLIENT)
+myClient.on('disconnect', function() {
+    console.log('disconnect!');
+}); // on disconnected (CLIENT)        
+myClient.on('reconnect_attempt', function() {
+    console.log('reconnect_attempt');
+}); //on start reconnnection (CLIENT)
+myClient.on('reconnecting', function() {
+    console.log('reconnecting');
+}); //on reconnecting (CLIENT)
+myClient.on('connect_error', function() {
+    console.log('connect_error');
+}); // (CLIENT)
+myClient.on('reconnect_error', function() {
+    console.log('reconnect_error');
+}); // (CLIENT)
+myClient.on('reconnect_failed', function() {
+    console.log('reconnect_failed');
+}); //(CLIENT)
+
+myClient.on('error', function(d) {
+    console.log('error', d);
+});
+myClient.on('connecting', function() {
+    console.log('connecting');
+});
+myClient.on('connect_failed', function() {
+    console.log('connect_failed');
+});
+myClient.on('reconnect', function() {
+    console.log('reconnect');
+});
+myClient.on('connect_timeout', function() {
+    console.log('connect_timeout');
 });
 
 var a = 1;
