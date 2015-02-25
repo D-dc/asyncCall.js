@@ -516,7 +516,7 @@ describe('RPC tests', function() {
             this.timeout(1200);
             myClient.rpcCall('testSlowComputation', [], function(err, res) {
                 expect(err).not.to.be.null;
-                expect(err.name).to.equal('Error');
+                expect(err).to.be.an.instanceof(TimeOutError);
                 expect(res).to.equal(undefined);
                 done();
             }, 1000);
@@ -547,7 +547,7 @@ describe('RPC tests', function() {
             });
             myClient.rpcCall('testFuncNoReturn', [], function(err, res) {
                 expect(err).not.to.be.null;
-                expect(err.name).to.equal('Error');
+                expect(err).to.be.an.instanceof(TimeOutError);
                 expect(res).to.equal(undefined);
                 done();
             }, 1);

@@ -14,8 +14,9 @@ app.use('/', express.static(__dirname + '/../'));
 
 var options = {
     pingTimeout: 6000, //timeout from client to receive new heartbeat from server (value shipped to client)
+                        //= time client to server calls are buffered!
     pingInterval: 2500, //timeout when server should send heartbeat to client
-    leaseLifeTime: 30000, //default lifetime of lease, after connection, this is the time the connection lasts
+    leaseLifeTime: 15000, //default lifetime of lease, after connection, this is the time the connection lasts
     leaseRenewOnCall: false, //when a successful RPC is performed (or received), renew lease lifetime.
     leaseRenewalTime: 15000, //renew lease by this time when successful RPC send/received
     defaultRpcTimeout: Infinity //default delay before an RPC call should have its reply. Infinity = no timeout

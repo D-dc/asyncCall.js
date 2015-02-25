@@ -49,7 +49,6 @@ myClient.on('reconnect_error', function() {
 myClient.on('reconnect_failed', function() {
     console.log('reconnect_failed');
 }); //(CLIENT)
-
 myClient.on('error', function(d) {
     console.log('error', d);
 });
@@ -70,16 +69,21 @@ var a = 1;
 var b = 2;
 var c = 3;
 
+/*
+    EXAMPLES
+*/
 
 /*
     CallServer No due => default keep waiting for reply for ever
 */
 var callServer = function() {
     console.log('CallServer called');
-    myClient.rpcCall('testRemote', [a, b, c], function(err, res) {
+
+    myClient.rpcCall('testRemote', [a, b, c], function(err, res) {e
         console.log(' - Callback result param: ', res);
         console.log(' - Callback error param: ', err);
     });
+
 };
 
 /*
@@ -87,10 +91,12 @@ var callServer = function() {
 */
 var callServerDue = function() {
     console.log('CallServerDue called');
+    
     myClient.rpcCall('testRemote', [a, b, c], function(err, res) {
         console.log(' - Callback result param: ', res);
         console.log(' - Callback error param: ', err);
     }, 2);
+
 };
 
 /*
@@ -114,5 +120,3 @@ var callServerTriggerException = function() {
         console.log(' - Callback error param: ', err);
     });
 };
-
-
