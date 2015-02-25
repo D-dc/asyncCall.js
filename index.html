@@ -3,21 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <title>RPC</title>
+   
 </head>
 <body>
   <input type="submit" onclick="javascript:callServer();" value="RPC to Server No Due" />
   <input type="submit" onclick="javascript:callServerDue();" value="RPC to Server Due" />
   <input type="submit" onclick="javascript:callServerInexist();" value="RPC to Server function not exists" />
   <input type="submit" onclick="javascript:callServerTriggerException();" value="RPC to Server Exception in body" />
-  <script src="/socket.io/socket.io.js"></script>
-  
-  <!-- browserify this later 
-  <script src="client-include.js"></script>-->
-
-  <script src="/lib/storage.js"></script>
-  <script src="/lib/exception.js"></script>
-  <script src="/lib/rpc.js"></script>
-  <script src="/lib/rpc-client.js"></script>
+  <script src="/client/bundle.js"></script>-
 
   <!-- actual code -->
   <script src="/example/client.js"></script>
