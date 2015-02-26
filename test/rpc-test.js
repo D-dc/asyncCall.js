@@ -101,6 +101,7 @@ describe('RPC tests', function() {
     describe('testFuncNoArgs', function() {
         it('rpc should return true', function(done) {
             myClient.rpcCall('testFuncNoArgs', [], function(err, res) {
+                console.log('AAAA' + err)
                 expect(err).to.equal(null);
                 expect(res).to.be.true;
                 done();

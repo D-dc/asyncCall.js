@@ -14,14 +14,14 @@ app.use('/client', express.static(__dirname + '/../../client/'));
 app.use('/', express.static(__dirname + '/'));
 
 
-//various options
+//We Put calls (chat messages) in queues for 2 minutes.
 var options = {
-    pingTimeout: 30000, //timeout from client to receive new heartbeat from server (value shipped to client) = time client to server calls are buffered!                 //
-    pingInterval: 2500, //timeout when server should send heartbeat to client
-    leaseLifeTime: 30000, //default lifetime of lease, after connection, this is the time the connection lasts
-    leaseRenewOnCall: true, //when a successful RPC is performed (or received), renew lease lifetime.
-    leaseRenewalTime: 15000, //renew lease by this time when successful RPC send/received
-    defaultRpcTimeout: Infinity //default delay before an RPC call should have its reply. Infinity = no timeout
+    pingTimeout: 120000, //client2server
+    pingInterval: 25000, 
+    leaseLifeTime: 120000, //server2client
+    leaseRenewOnCall: true, 
+    leaseRenewalTime: 120000, 
+    defaultRpcTimeout: Infinity 
 };
 
 // make the ServerRpc by giving the http server, options

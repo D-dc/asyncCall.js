@@ -131,6 +131,21 @@ describe('Server tests', function() {
             makeBrowserClient('client-426-855');
         });
 
+        it('multiple clients', function(done) {
+            var myServer = makeServer(methods, defaultOptions);
+            var client1 = makeBrowserClient();
+            var client2 = makeBrowserClient();
+            var connections = 0;
+            myServer.onConnection(function(s) {
+                connections++;
+                if(connections === 2){
+                    myServer.close();
+                    cleanup();
+                    done();
+                }
+            });
+        });
+
         it('server should remove connection when client send close message', function(done) {
             this.timeout(10000);
             var myServer = makeServer(methods, defaultOptions);
@@ -157,7 +172,7 @@ describe('Server tests', function() {
                 }, 3000);
         });
 
-
+        
         it('server should remove connection when client loses connection', function(done) {
             this.timeout(10000);
             var myServer = makeServer(methods, leaseShortTime);
@@ -187,7 +202,7 @@ describe('Server tests', function() {
     describe('lease tests', function() {
         describe('leaseRenewOnCall', function() {
 
-            it('server should have closed connection', function(done) {
+            it('server should have closed connection (lease expired)', function(done) {
                 this.timeout(10000);
                 var myServer = makeServer(methods, leaseShortTime);
 
@@ -204,7 +219,7 @@ describe('Server tests', function() {
 
             });
 
-            it('server should have renewed lease', function(done) {
+            it('server should have renewed lease on RPC', function(done) {
                 this.timeout(10000);
                 var myServer = makeServer(methods, leaseShortTime);
 
@@ -231,7 +246,7 @@ describe('Server tests', function() {
 
             });
 
-            it('server should have renewed lease (undefined function)', function(done) {
+            it('server should have renewed lease on RPC (undefined function)', function(done) {
                 this.timeout(10000);
                 var myServer = makeServer(methods, leaseShortTime);
 
@@ -281,7 +296,7 @@ describe('Server tests', function() {
 
             });
 
-            it('server should not renew lease on RPC undefined function', function(done) {
+            it('server should not renew lease on RPC (undefined function)', function(done) {
                 this.timeout(10000);
                 var myServer = makeServer(methods, leaseShortTimeNoRenew);
 
@@ -305,7 +320,7 @@ describe('Server tests', function() {
     });
 
     describe('lease client leaseRenewOnExpire', function() {
-        it('client should renew lease', function(done) {
+        it('server should ask the client to renew lease', function(done) {
             this.timeout(10000);
             var myServer = makeServer(methods, leaseShortTimeNoRenew);
             var c = makeBrowserClient(null, clientOptionsRenewOnExpire);
@@ -360,7 +375,7 @@ describe('Server tests', function() {
                 done();
             }, 8000);
 
-        });
+        }); 
 
     });
 });
