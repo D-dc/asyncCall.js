@@ -131,12 +131,14 @@ describe('Server tests', function() {
             makeBrowserClient('client-426-855');
         });
 
-        it('multiple clients', function(done) {
+        /*it('multiple clients', function(done) {
             var myServer = makeServer(methods, defaultOptions);
             var client1 = makeBrowserClient();
             var client2 = makeBrowserClient();
             var connections = 0;
+            
             myServer.onConnection(function(s) {
+
                 connections++;
                 if(connections === 2){
                     myServer.close();
@@ -144,7 +146,7 @@ describe('Server tests', function() {
                     done();
                 }
             });
-        });
+        });*/
 
         it('server should remove connection when client send close message', function(done) {
             this.timeout(10000);

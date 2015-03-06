@@ -41,6 +41,3 @@ var speakMsg = function() {
 
     });
 };
-
-
-

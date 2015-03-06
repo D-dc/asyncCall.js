@@ -9,7 +9,7 @@ var options =  {
     timeout: 2000, //time before connect_error, connect_timeout events
     autoConnect: true, //automatically connect
     defaultRpcTimeout: Infinity, //default delay before an RPC call should have its reply. Infinity = no timeout
-    leaseRenewOnExpire: true
+    leaseRenewOnExpire: false
 };
 
 

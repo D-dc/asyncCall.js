@@ -18,7 +18,7 @@ var options = {
     pingTimeout: 6000, //timeout from client to receive new heartbeat from server (value shipped to client) = time client to server calls are buffered!                 //
     pingInterval: 2500, //timeout when server should send heartbeat to client
     leaseLifeTime: 15000, //default lifetime of lease, after connection, this is the time the connection lasts
-    leaseRenewOnCall: false, //when a successful RPC is performed (or received), renew lease lifetime.
+    leaseRenewOnCall: true, //when a successful RPC is performed (or received), renew lease lifetime.
     leaseRenewalTime: 15000, //renew lease by this time when successful RPC send/received
     defaultRpcTimeout: Infinity //default delay before an RPC call should have its reply. Infinity = no timeout
 };
@@ -55,7 +55,6 @@ myServer.onConnection(function(client){
     client.on('error', function(d) { console.log('error', d);});
     client.on('reconnect', function(d) { console.log('reconnect', d);});
 
-    
     //To RPC a specific client use client.rpcCall
     //To broadcast to all clients use server.rpcCall 
 });
@@ -68,7 +67,7 @@ var callClient = function() {
     //We call the testclient function on every connected client.
     //temporarily disconnected clients will receive the call upon reconnection.
     myServer.rpcCall('testClient', [d], function(err, res) {
-        console.log('testClient reply ' + d);
+        console.log('testClient reply ', err, res);
         d++;    
     });
 
