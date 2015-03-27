@@ -175,209 +175,209 @@ describe('Server tests', function() {
         });
 
         
-        it('server should remove connection when client loses connection', function(done) {
-            this.timeout(10000);
-            var myServer = makeServer(methods, leaseShortTime);
-            var c = makeBrowserClient();
+        // it('server should remove connection when client loses connection', function(done) {
+        //     this.timeout(10000);
+        //     var myServer = makeServer(methods, leaseShortTime);
+        //     var c = makeBrowserClient();
 
-            setTimeout(function() {
-                expect(c.RPC.socket.connected).to.be.true;
-                expect(Object.keys(myServer.clientChannels).length).to.be.equal(1);
+        //     setTimeout(function() {
+        //         expect(c.RPC.socket.connected).to.be.true;
+        //         expect(Object.keys(myServer.clientChannels).length).to.be.equal(1);
 
-                }, 1000);
+        //         }, 1000);
 
-            setTimeout(function() {
-                c.RPC.socket.close(); //client loses connection
-                }, 1500);
+        //     setTimeout(function() {
+        //         c.RPC.socket.close(); //client loses connection
+        //         }, 1500);
 
-            setTimeout(function() {
-                expect(c.RPC.socket.connected).not.to.be.true;
-                expect(Object.keys(myServer.clientChannels).length).to.be.equal(0);
+        //     setTimeout(function() {
+        //         expect(c.RPC.socket.connected).not.to.be.true;
+        //         expect(Object.keys(myServer.clientChannels).length).to.be.equal(0);
 
-                myServer.close();
-                cleanup();
-                done();
-                }, 8000);
-        });
+        //         myServer.close();
+        //         cleanup();
+        //         done();
+        //         }, 8000);
+        // });
     });
 
-    describe('lease tests', function() {
-        describe('leaseRenewOnCall', function() {
+    // describe('lease tests', function() {
+    //     describe('leaseRenewOnCall', function() {
 
-            it('server should have closed connection (lease expired)', function(done) {
-                this.timeout(10000);
-                var myServer = makeServer(methods, leaseShortTime);
+    //         it('server should have closed connection (lease expired)', function(done) {
+    //             this.timeout(10000);
+    //             var myServer = makeServer(methods, leaseShortTime);
 
-                var c = makeBrowserClient();
+    //             var c = makeBrowserClient();
 
-                setTimeout(function() {
-                    expect(c.RPC.socket.connected).not.to.be.true;
-                    expect(Object.keys(myServer.clientChannels).length).to.be.equal(0);
+    //             setTimeout(function() {
+    //                 expect(c.RPC.socket.connected).not.to.be.true;
+    //                 expect(Object.keys(myServer.clientChannels).length).to.be.equal(0);
 
-                    myServer.close();
-                    cleanup();
-                    done();
-                }, 8000);
+    //                 myServer.close();
+    //                 cleanup();
+    //                 done();
+    //             }, 8000);
 
-            });
+    //         });
 
-            it('server should have renewed lease on RPC', function(done) {
-                this.timeout(10000);
-                var myServer = makeServer(methods, leaseShortTime);
+    //         it('server should have renewed lease on RPC', function(done) {
+    //             this.timeout(10000);
+    //             var myServer = makeServer(methods, leaseShortTime);
 
-                var c = makeBrowserClient();
+    //             var c = makeBrowserClient();
 
-                setTimeout(function() {
-                    c.rpcCall('dummy', []);
-                }, 1500);
+    //             setTimeout(function() {
+    //                 c.rpcCall('dummy', []);
+    //             }, 1500);
 
-                setTimeout(function() {
-                    expect(c.RPC.socket.connected).to.be.true;
-                    expect(Object.keys(myServer.clientChannels).length).to.be.equal(1);
+    //             setTimeout(function() {
+    //                 expect(c.RPC.socket.connected).to.be.true;
+    //                 expect(Object.keys(myServer.clientChannels).length).to.be.equal(1);
 
-                }, 3000);
+    //             }, 3000);
 
-                setTimeout(function() {
-                    expect(c.RPC.socket.connected).not.to.be.true;
-                    expect(Object.keys(myServer.clientChannels).length).to.be.equal(0);
+    //             setTimeout(function() {
+    //                 expect(c.RPC.socket.connected).not.to.be.true;
+    //                 expect(Object.keys(myServer.clientChannels).length).to.be.equal(0);
 
-                    myServer.close();
-                    cleanup();
-                    done();
-                }, 9000);
+    //                 myServer.close();
+    //                 cleanup();
+    //                 done();
+    //             }, 9000);
 
-            });
+    //         });
 
-            it('server should have renewed lease on RPC (undefined function)', function(done) {
-                this.timeout(10000);
-                var myServer = makeServer(methods, leaseShortTime);
+    //         it('server should have renewed lease on RPC (undefined function)', function(done) {
+    //             this.timeout(10000);
+    //             var myServer = makeServer(methods, leaseShortTime);
 
-                var c = makeBrowserClient();
+    //             var c = makeBrowserClient();
 
-                setTimeout(function() {
-                    c.rpcCall('undefined', []);
-                }, 1500);
+    //             setTimeout(function() {
+    //                 c.rpcCall('undefined', []);
+    //             }, 1500);
 
-                setTimeout(function() {
-                    expect(c.RPC.socket.connected).to.be.true;
-                    expect(Object.keys(myServer.clientChannels).length).to.be.equal(1);
+    //             setTimeout(function() {
+    //                 expect(c.RPC.socket.connected).to.be.true;
+    //                 expect(Object.keys(myServer.clientChannels).length).to.be.equal(1);
 
-                }, 3000);
+    //             }, 3000);
 
-                setTimeout(function() {
-                    expect(c.RPC.socket.connected).not.to.be.true;
-                    expect(Object.keys(myServer.clientChannels).length).to.be.equal(0);
+    //             setTimeout(function() {
+    //                 expect(c.RPC.socket.connected).not.to.be.true;
+    //                 expect(Object.keys(myServer.clientChannels).length).to.be.equal(0);
 
-                    myServer.close();
-                    cleanup();
-                    done();
-                }, 9000);
-            });
+    //                 myServer.close();
+    //                 cleanup();
+    //                 done();
+    //             }, 9000);
+    //         });
 
-        });
+    //     });
 
-        describe('No leaseRenewOnCall', function() {
+    //     describe('No leaseRenewOnCall', function() {
 
-            it('server should not renew lease on RPC', function(done) {
-                this.timeout(10000);
-                var myServer = makeServer(methods, leaseShortTimeNoRenew);
-                var c = makeBrowserClient();
+    //         it('server should not renew lease on RPC', function(done) {
+    //             this.timeout(10000);
+    //             var myServer = makeServer(methods, leaseShortTimeNoRenew);
+    //             var c = makeBrowserClient();
 
-                setTimeout(function() {
-                    c.rpcCall('dummy', []);
-                }, 1500);
+    //             setTimeout(function() {
+    //                 c.rpcCall('dummy', []);
+    //             }, 1500);
 
-                setTimeout(function() {
-                    expect(c.RPC.socket.connected).not.to.be.true;
-                    expect(Object.keys(myServer.clientChannels).length).to.be.equal(0);
+    //             setTimeout(function() {
+    //                 expect(c.RPC.socket.connected).not.to.be.true;
+    //                 expect(Object.keys(myServer.clientChannels).length).to.be.equal(0);
 
-                    myServer.close();
-                    cleanup();
-                    done();
-                }, 8000);
+    //                 myServer.close();
+    //                 cleanup();
+    //                 done();
+    //             }, 8000);
 
-            });
+    //         });
 
-            it('server should not renew lease on RPC (undefined function)', function(done) {
-                this.timeout(10000);
-                var myServer = makeServer(methods, leaseShortTimeNoRenew);
+    //         it('server should not renew lease on RPC (undefined function)', function(done) {
+    //             this.timeout(10000);
+    //             var myServer = makeServer(methods, leaseShortTimeNoRenew);
 
-                var c = makeBrowserClient();
+    //             var c = makeBrowserClient();
 
-                setTimeout(function() {
-                    c.rpcCall('undefined', []);
-                }, 1500);
+    //             setTimeout(function() {
+    //                 c.rpcCall('undefined', []);
+    //             }, 1500);
 
-                setTimeout(function() {
-                    expect(c.RPC.socket.connected).not.to.be.true;
-                    expect(Object.keys(myServer.clientChannels).length).to.be.equal(0);
+    //             setTimeout(function() {
+    //                 expect(c.RPC.socket.connected).not.to.be.true;
+    //                 expect(Object.keys(myServer.clientChannels).length).to.be.equal(0);
 
-                    myServer.close();
-                    cleanup();
-                    done();
-                }, 8000);
+    //                 myServer.close();
+    //                 cleanup();
+    //                 done();
+    //             }, 8000);
 
-            });
-        });
-    });
+    //         });
+    //     });
+    // });
 
-    describe('lease client leaseRenewOnExpire', function() {
-        it('server should ask the client to renew lease', function(done) {
-            this.timeout(10000);
-            var myServer = makeServer(methods, leaseShortTimeNoRenew);
-            var c = makeBrowserClient(null, clientOptionsRenewOnExpire);
+    // describe('lease client leaseRenewOnExpire', function() {
+    //     it('server should ask the client to renew lease', function(done) {
+    //         this.timeout(10000);
+    //         var myServer = makeServer(methods, leaseShortTimeNoRenew);
+    //         var c = makeBrowserClient(null, clientOptionsRenewOnExpire);
 
 
-            setTimeout(function() {
-                expect(c.RPC.socket.connected).to.be.true;
-                expect(Object.keys(myServer.clientChannels).length).to.be.equal(1);
+    //         setTimeout(function() {
+    //             expect(c.RPC.socket.connected).to.be.true;
+    //             expect(Object.keys(myServer.clientChannels).length).to.be.equal(1);
 
-                myServer.close();
-                cleanup();
-                done();
-            }, 4000);
+    //             myServer.close();
+    //             cleanup();
+    //             done();
+    //         }, 4000);
 
-        });
+    //     });
 
-        it('server should not renew lease on RPC', function(done) {
-            this.timeout(10000);
-            var myServer = makeServer(methods, leaseShortTimeNoRenew);
-            var c = makeBrowserClient(null, clientOptionsRenewOnExpire);
+    //     it('server should not renew lease on RPC', function(done) {
+    //         this.timeout(10000);
+    //         var myServer = makeServer(methods, leaseShortTimeNoRenew);
+    //         var c = makeBrowserClient(null, clientOptionsRenewOnExpire);
 
-            setTimeout(function() {
-                c.rpcCall('dummy', []);
-            }, 1500);
+    //         setTimeout(function() {
+    //             c.rpcCall('dummy', []);
+    //         }, 1500);
 
-            setTimeout(function() {
-                expect(c.RPC.socket.connected).to.be.true;
-                expect(Object.keys(myServer.clientChannels).length).to.be.equal(1);
+    //         setTimeout(function() {
+    //             expect(c.RPC.socket.connected).to.be.true;
+    //             expect(Object.keys(myServer.clientChannels).length).to.be.equal(1);
 
-                myServer.close();
-                cleanup();
-                done();
-            }, 4000);
+    //             myServer.close();
+    //             cleanup();
+    //             done();
+    //         }, 4000);
 
-        });
+    //     });
 
-        it('server should not renew lease on RPC undefined function', function(done) {
-            this.timeout(10000);
-            var myServer = makeServer(methods, leaseShortTimeNoRenew);
-            var c = makeBrowserClient(null, clientOptionsRenewOnExpire);
+    //     it('server should not renew lease on RPC undefined function', function(done) {
+    //         this.timeout(10000);
+    //         var myServer = makeServer(methods, leaseShortTimeNoRenew);
+    //         var c = makeBrowserClient(null, clientOptionsRenewOnExpire);
 
-            setTimeout(function() {
-                c.rpcCall('undefined', []);
-            }, 1500);
+    //         setTimeout(function() {
+    //             c.rpcCall('undefined', []);
+    //         }, 1500);
 
-            setTimeout(function() {
-                expect(c.RPC.socket.connected).to.be.true;
-                expect(Object.keys(myServer.clientChannels).length).to.be.equal(1);
+    //         setTimeout(function() {
+    //             expect(c.RPC.socket.connected).to.be.true;
+    //             expect(Object.keys(myServer.clientChannels).length).to.be.equal(1);
 
-                myServer.close();
-                cleanup();
-                done();
-            }, 8000);
+    //             myServer.close();
+    //             cleanup();
+    //             done();
+    //         }, 8000);
 
-        }); 
+    //     }); 
 
-    });
+    // });
 });
