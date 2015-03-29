@@ -85,10 +85,10 @@ var methods = {
     }
 };
 
-var myServer = new ServerRpc(serverHttp);
+var myServer = new ServerRpc(serverHttp, {throwNativeError:false});
 myServer.expose(methods);
 
-var myClient = new ClientRpc('http://127.0.0.1:8123');
+var myClient = new ClientRpc('http://127.0.0.1:8123', {throwNativeError:false});
 myClient.expose({});
 
 // TESTS
@@ -354,19 +354,19 @@ describe('RPC tests', function() {
 
             it('rpc should not have callback error argument set', function(done) {
                 myClient.rpcCall('testImplicitException', [arg], function(err, res) {
-                    expect(err).to.equal(null);
-                    expect(res).to.equal(3);
-                    done();
-                });
+                        expect(err).to.equal(null);
+                        expect(res).to.equal(3);
+                        done();
+                    });
             });
 
             it('rpc should have error argument in callback set', function(done) {
                 myClient.rpcCall('testImplicitException', [null], function(err, res) {
-                    expect(err).not.to.be.null;
-                    expect(err.name).to.equal('TypeError');
-                    expect(res).to.be.undefined;
-                    done();
-                });
+                        expect(err).not.to.be.null;
+                        expect(err.name).to.equal('TypeError');
+                        expect(res).to.be.undefined;
+                        done();
+                    });
             });
         });
 

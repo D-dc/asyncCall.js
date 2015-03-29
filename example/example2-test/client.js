@@ -1,5 +1,32 @@
 'use strict';
 
+//log proxy
+    var makeLogProxy = function(target){
+        var counter = 0;
+
+        var writeLog = function(msg){
+            counter++;
+            console.log('Log ', counter, ': ', msg);
+        };
+
+        return makeJSProxy(target, {
+            rpcCall: function(originalCall, args, context, subject){
+                var foreignFuncName = args[0]; 
+                var foreignFuncArgs = args[1]; 
+                var cb = args[2]; 
+                
+                writeLog('CALL ' + foreignFuncName + foreignFuncArgs);
+                args[2] = function(err, res){
+                    writeLog('RESULT ' + res + err);
+                    return cb(err, res);
+                };
+                    
+                return originalCall.apply(context, args);
+            }
+        });
+    };
+
+
 var options =  {
     reconnection: true, //auto reconnect
     reconnectionAttempts: Infinity, //attempts before giving up
@@ -9,8 +36,7 @@ var options =  {
     timeout: 2000, //time before connect_error, connect_timeout events
     autoConnect: true, //automatically connect
     defaultRpcTimeout: Infinity, //default delay before an RPC call should have its reply. Infinity = no timeout
-    leaseRenewOnExpire: false,
-    throwNativeError:false
+    leaseRenewOnExpire: false
 };
 
 
@@ -27,6 +53,10 @@ myClient.expose({
         }, 2000);
     }
 });
+var l = makeLogProxy(myClient);
+
+
+
 
 //EVENTS called on client side
 myClient.on('connect', function() {
@@ -80,7 +110,7 @@ var c = 3;
 var callServer = function() {
     console.log('CallServer called');
 
-    myClient.rpcCall('testRemote', [a, b, c], function(err, res) {
+    l.rpcCall('testRemote', [a, b, c], function(err, res) {
         console.log(' - Callback result param: ', res);
         console.log(' - Callback error param: ', err);
     });

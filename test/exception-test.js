@@ -30,16 +30,17 @@ describe('lib/exception.js tests', function() {
 
             expect(Excpt.isException(e)).to.be.true;
             expect(Excpt.isImplicitException(e)).to.be.true;
-            expect(Excpt.isOfError(e)).to.be.false;
+            expect(Excpt.isOfError(e)).to.be.true;
+
             done();
         });
 
         it('library Error', function(done) {
             var e = new FunctionNotFoundError('message');
-
+            
             expect(Excpt.isException(e)).to.be.true;
             expect(Excpt.isImplicitException(e)).to.be.true;
-            expect(Excpt.isOfError(e)).to.be.false;
+            expect(Excpt.isOfError(e)).to.be.true;
             done();
         });
 
@@ -75,7 +76,7 @@ describe('lib/exception.js tests', function() {
 
             expect(Excpt.isException(e)).to.be.true;
             expect(Excpt.isImplicitException(e)).to.be.false;
-            expect(Excpt.isOfError(e)).to.be.false;
+            expect(Excpt.isOfError(e)).to.be.true;
             done();
         });
     });

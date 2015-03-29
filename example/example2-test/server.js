@@ -20,8 +20,7 @@ var options = {
     leaseLifeTime: 15000, //default lifetime of lease, after connection, this is the time the connection lasts
     leaseRenewOnCall: true, //when a successful RPC is performed (or received), renew lease lifetime.
     leaseRenewalTime: 15000, //renew lease by this time when successful RPC send/received
-    defaultRpcTimeout: Infinity, //default delay before an RPC call should have its reply. Infinity = no timeout
-    throwNativeError:false
+    defaultRpcTimeout: Infinity //default delay before an RPC call should have its reply. Infinity = no timeout
 };
 
 
