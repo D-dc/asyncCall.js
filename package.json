@@ -1,5 +1,5 @@
 {
-  "name": "rpc-leases",
+  "name": "rpc",
   "version": "0.0.1",
   "description": "An RPC library.",
   "main": "index.js",
@@ -23,12 +23,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dielc/lease-rpc"
+    "url": "https://github.com/dielc/rpc"
   },
   "bugs": {
-    "url": "https://github.com/dielc/lease-rpc/issues"
+    "url": "https://github.com/dielc/rpc/issues"
   },
-  "homepage": "https://github.com/dielc/lease-rpc",
+  "homepage": "https://github.com/dielc/rpc",
   "directories": {
     "example": "example",
     "test": "test"
@@ -36,7 +36,9 @@
   "keywords": [
     "rpc",
     "rmi",
-    "lease",
+    "websocket",
+    "error",
+    "exception"
     "socket.io"
   ]
 }
