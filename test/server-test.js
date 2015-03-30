@@ -228,7 +228,7 @@ describe('Server tests', function() {
     //             var c = makeBrowserClient();
 
     //             setTimeout(function() {
-    //                 c.rpcCall('dummy', []);
+    //                 c.rpc('dummy', []);
     //             }, 1500);
 
     //             setTimeout(function() {
@@ -255,7 +255,7 @@ describe('Server tests', function() {
     //             var c = makeBrowserClient();
 
     //             setTimeout(function() {
-    //                 c.rpcCall('undefined', []);
+    //                 c.rpc('undefined', []);
     //             }, 1500);
 
     //             setTimeout(function() {
@@ -284,7 +284,7 @@ describe('Server tests', function() {
     //             var c = makeBrowserClient();
 
     //             setTimeout(function() {
-    //                 c.rpcCall('dummy', []);
+    //                 c.rpc('dummy', []);
     //             }, 1500);
 
     //             setTimeout(function() {
@@ -305,7 +305,7 @@ describe('Server tests', function() {
     //             var c = makeBrowserClient();
 
     //             setTimeout(function() {
-    //                 c.rpcCall('undefined', []);
+    //                 c.rpc('undefined', []);
     //             }, 1500);
 
     //             setTimeout(function() {
@@ -345,7 +345,7 @@ describe('Server tests', function() {
     //         var c = makeBrowserClient(null, clientOptionsRenewOnExpire);
 
     //         setTimeout(function() {
-    //             c.rpcCall('dummy', []);
+    //             c.rpc('dummy', []);
     //         }, 1500);
 
     //         setTimeout(function() {
@@ -365,7 +365,7 @@ describe('Server tests', function() {
     //         var c = makeBrowserClient(null, clientOptionsRenewOnExpire);
 
     //         setTimeout(function() {
-    //             c.rpcCall('undefined', []);
+    //             c.rpc('undefined', []);
     //         }, 1500);
 
     //         setTimeout(function() {

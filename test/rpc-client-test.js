@@ -17,7 +17,7 @@ describe('Client RPC tests', function() {
     it('parameters should remove calls on invoking callback', function(done) {
         this.exposedFunctions = [];
         var c = myClient.RPC;
-        myClient.rpcCall('testFuncNoArgs', [], function(err, res) {
+        myClient.rpc('testFuncNoArgs', [], function(err, res) {
             expect(Object.keys(c.openCalls).length).to.equal(0);
             done();
         });
@@ -26,9 +26,9 @@ describe('Client RPC tests', function() {
     it('parameters should remove calls on invoking callback', function(done) {
         this.exposedFunctions = [];
         var c = myClient.RPC;
-        myClient.rpcCall('testFuncNoArgs', [], function(err, res) {
-            myClient.rpcCall('testFuncNoArgs', [], function(err, res) {
-                myClient.rpcCall('testFuncNoArgs', [], function(err, res) {
+        myClient.rpc('testFuncNoArgs', [], function(err, res) {
+            myClient.rpc('testFuncNoArgs', [], function(err, res) {
+                myClient.rpc('testFuncNoArgs', [], function(err, res) {
                     expect(Object.keys(c.openCalls).length).to.equal(0);
                     done();
                 });
@@ -39,7 +39,7 @@ describe('Client RPC tests', function() {
     it('parameters should remove calls on invoking callback with exception', function(done) {
         this.exposedFunctions = [];
         var c = myClient.RPC;
-        myClient.rpcCall('testExplicitException', [], function(err, res) {
+        myClient.rpc('testExplicitException', [], function(err, res) {
             expect(Object.keys(c.openCalls).length).to.equal(0);
             done();
         });
@@ -48,9 +48,9 @@ describe('Client RPC tests', function() {
     it('parameters should remove calls on invoking callback with exception', function(done) {
         this.exposedFunctions = [];
         var c = myClient.RPC;
-        myClient.rpcCall('testExplicitException', [], function(err, res) {
-            myClient.rpcCall('testExplicitException', [], function(err, res) {
-                myClient.rpcCall('testExplicitException', [], function(err, res) {
+        myClient.rpc('testExplicitException', [], function(err, res) {
+            myClient.rpc('testExplicitException', [], function(err, res) {
+                myClient.rpc('testExplicitException', [], function(err, res) {
                     expect(Object.keys(c.openCalls).length).to.equal(0);
                     done();
                 });
@@ -68,7 +68,7 @@ describe('Client RPC tests', function() {
     it('parameters should be correct', function(done) {
         this.exposedFunctions = [];
         var c = myClient.RPC;
-        myClient.rpcCall('nonexist');
+        myClient.rpc('nonexist');
         expect(Object.keys(c.openCalls).length).to.equal(1);
         done();
     });
@@ -76,9 +76,9 @@ describe('Client RPC tests', function() {
     it('parameters should be correct', function(done) {
         this.exposedFunctions = [];
         var c = myClient2.RPC;
-        myClient2.rpcCall('nonexist');
-        myClient2.rpcCall('nonexist');
-        myClient2.rpcCall('nonexist');
+        myClient2.rpc('nonexist');
+        myClient2.rpc('nonexist');
+        myClient2.rpc('nonexist');
         expect(Object.keys(c.openCalls).length).to.equal(3);
         done();
     });
@@ -86,8 +86,8 @@ describe('Client RPC tests', function() {
     it('parameters should be correct', function(done) {
         this.exposedFunctions = [];
         var c = myClient3.RPC;
-        myClient3.rpcCall('testFuncNoArgs', [], function(err, res) {
-            myClient3.rpcCall('nonexist');
+        myClient3.rpc('testFuncNoArgs', [], function(err, res) {
+            myClient3.rpc('nonexist');
             expect(Object.keys(c.openCalls).length).to.equal(1);
             done();
         });
