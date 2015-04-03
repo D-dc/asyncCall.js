@@ -3,7 +3,7 @@ var express = require('express'),
     serverHttp = require('http').createServer(app),
     ServerRpc = require('../lib/rpc-server.js'),
     ClientRpc = require('../lib/rpc-client.js'),
-    port = 8123,
+    port = 8124,
     assert = require("assert"),
     expect = require('chai').expect;
 
@@ -88,7 +88,7 @@ var methods = {
 var myServer = new ServerRpc(serverHttp, {throwNativeError:false});
 myServer.expose(methods);
 
-var myClient = new ClientRpc('http://127.0.0.1:8123', {throwNativeError:false});
+var myClient = new ClientRpc('http://127.0.0.1:8124', {throwNativeError:false});
 myClient.expose({});
 
 // TESTS
@@ -101,7 +101,6 @@ describe('RPC tests', function() {
     describe('testFuncNoArgs', function() {
         it('rpc should return true', function(done) {
             myClient.rpc('testFuncNoArgs', [], function(err, res) {
-                console.log('AAAA' + err)
                 expect(err).to.equal(null);
                 expect(res).to.be.true;
                 done();
@@ -557,6 +556,99 @@ describe('RPC tests', function() {
 
     });
 
+});
+
+
+
+myClient = new ClientRpc('http://127.0.0.1:8124');
+myClient2 = new ClientRpc('http://127.0.0.1:8124');
+myClient3 = new ClientRpc('http://127.0.0.1:8124');
+
+
+myClient.expose({});
+
+// TESTS
+
+
+describe('Client RPC tests', function() {
+    it('parameters should remove calls on invoking callback', function(done) {
+        this.exposedFunctions = [];
+        var c = myClient.RPC;
+        myClient.rpc('testFuncNoArgs', [], function(err, res) {
+            expect(Object.keys(c.openCalls).length).to.equal(0);
+            done();
+        });
+    });
+
+    it('parameters should remove calls on invoking callback', function(done) {
+        this.exposedFunctions = [];
+        var c = myClient.RPC;
+        myClient.rpc('testFuncNoArgs', [], function(err, res) {
+            myClient.rpc('testFuncNoArgs', [], function(err, res) {
+                myClient.rpc('testFuncNoArgs', [], function(err, res) {
+                    expect(Object.keys(c.openCalls).length).to.equal(0);
+                    done();
+                });
+            });
+        });
+    });
+
+    it('parameters should remove calls on invoking callback with exception', function(done) {
+        this.exposedFunctions = [];
+        var c = myClient.RPC;
+        myClient.rpc('testExplicitException', [], function(err, res) {
+            expect(Object.keys(c.openCalls).length).to.equal(0);
+            done();
+        });
+    });
+
+    it('parameters should remove calls on invoking callback with exception', function(done) {
+        this.exposedFunctions = [];
+        var c = myClient.RPC;
+        myClient.rpc('testExplicitException', [], function(err, res) {
+            myClient.rpc('testExplicitException', [], function(err, res) {
+                myClient.rpc('testExplicitException', [], function(err, res) {
+                    expect(Object.keys(c.openCalls).length).to.equal(0);
+                    done();
+                });
+            });
+        });
+    });
+
+    it('parameters should be correct', function(done) {
+        this.exposedFunctions = [];
+        var c = myClient.RPC;
+        expect(Object.keys(c.openCalls).length).to.equal(0);
+        done();
+    });
+
+    it('parameters should be correct', function(done) {
+        this.exposedFunctions = [];
+        var c = myClient.RPC;
+        myClient.rpc('nonexist');
+        expect(Object.keys(c.openCalls).length).to.equal(1);
+        done();
+    });
+
+    it('parameters should be correct', function(done) {
+        this.exposedFunctions = [];
+        var c = myClient2.RPC;
+        myClient2.rpc('nonexist');
+        myClient2.rpc('nonexist');
+        myClient2.rpc('nonexist');
+        expect(Object.keys(c.openCalls).length).to.equal(3);
+        done();
+    });
+
+    it('parameters should be correct', function(done) {
+        this.exposedFunctions = [];
+        var c = myClient3.RPC;
+        myClient3.rpc('testFuncNoArgs', [], function(err, res) {
+            myClient3.rpc('nonexist');
+            expect(Object.keys(c.openCalls).length).to.equal(1);
+            done();
+        });
+    });
 });
 
 //TODO bidirectional tests

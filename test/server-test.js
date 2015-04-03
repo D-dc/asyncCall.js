@@ -3,7 +3,7 @@
 var express = require('express'),
     ServerRpc = require('../lib/rpc-server.js'),
     ClientRpc = require('../lib/rpc-client.js'),
-    port = 8124,
+    port = 8126,
     assert = require("assert"),
     expect = require('chai').expect;
 

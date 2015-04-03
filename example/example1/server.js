@@ -56,8 +56,8 @@ myServer.onConnection(function(client){
     client.on('error', function(d) { console.log('error', d);});
     client.on('reconnect', function(d) { console.log('reconnect', d);});
 
-    //To RPC a specific client use client.rpcCall
-    //To broadcast to all clients use server.rpcCall 
+    //To RPC a specific client use client.rpc
+    //To broadcast to all clients use server.rpc 
 });
 
 
@@ -67,7 +67,7 @@ var callClient = function() {
 
     //We call the testclient function on every connected client.
     //temporarily disconnected clients will receive the call upon reconnection.
-    myServer.rpcCall('testClient', [d], function(err, res) {
+    myServer.rpc('testClient', [d], function(err, res) {
         console.log('testClient reply ', err, res);
         d++;    
     });

@@ -38,7 +38,7 @@
     "rmi",
     "websocket",
     "error",
-    "exception"
+    "exception",
     "socket.io"
   ]
 }

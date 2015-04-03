@@ -23,7 +23,7 @@ myClient.expose({
     'ping': function(ctr) {
         console.log('ping ' + ctr);
         setTimeout(function() {
-            myClient.rpcCall('pong', [ctr]);
+            myClient.rpc('pong', [ctr]);
         }, 2000);
     }
 });
@@ -80,7 +80,7 @@ var c = 3;
 var callServer = function() {
     console.log('CallServer called');
 
-    myClient.rpcCall('testRemote', [a, b, c], function(err, res) {
+    myClient.rpc('testRemote', [a, b, c], function(err, res) {
         console.log(' - Callback result param: ', res);
         console.log(' - Callback error param: ', err);
     });
@@ -93,7 +93,7 @@ var callServer = function() {
 var callServerDue = function() {
     console.log('CallServerDue called');
     
-    myClient.rpcCall('testRemote', [a, b, c], function(err, res) {
+    myClient.rpc('testRemote', [a, b, c], function(err, res) {
         console.log(' - Callback result param: ', res);
         console.log(' - Callback error param: ', err);
     }, 2);
@@ -106,7 +106,7 @@ var callServerDue = function() {
 var callServerInexist = function() {
     console.log('CallServerInexist called');
 
-    myClient.rpcCall('testNonExists', [a, b, c], function(err, res) {
+    myClient.rpc('testNonExists', [a, b, c], function(err, res) {
         console.log(' - Callback result param: ', res);
         console.log(' - Callback error param: ', err);
     });
@@ -118,7 +118,7 @@ var callServerInexist = function() {
 var callServerTriggerException = function() {
     
     console.log('TriggerException called');
-    myClient.rpcCall('triggerException', [], function(err, res) {
+    myClient.rpc('triggerException', [], function(err, res) {
         console.log(' - Callback result param: ', res);
         console.log(' - Callback error param: ', err);
     });
