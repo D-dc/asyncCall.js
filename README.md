@@ -1,25 +1,31 @@
-# lease-rpc
-A nodeJS library for Remote Procedure Calls between Client & Server based on the concept of leases.
+# RPC
+A nodeJS library for Remote Procedure Calls between Client & Server with exception propagation (back from callee to caller) and delivery guarantees to support finegrained failure handling.
 
 ### Features
-#### **Operational failures**: 
-Example: Call function on other side that does not exists, function on other side has exceptional behaviour.
-  * *Implicit exceptions*: (EvalError, RangeError, ReferenceError, SyntaxError, TypeError, URIError). These exceptions are serialized back to the calling side and visible in the callback error argument.
-  * *Explicit exceptions*: (throw 5; throw new Error('message'); subtypes of Error). These exceptions are all mapped to the javascript Error type.
-  * Other failures like calling a function that does not exists. These are also mapped to the Error type.
+#### **Exceptions**: 
+All exceptions thrown by the callee will be serialized back to the caller so it can react upon it:
+* *Native Javascript errors*: EvalError, RangeError, ReferenceError, SyntaxError, TypeError, URIError.
+* *Application or Userdefined errors*: these should have as prototype Error();.
+* *Network errors*: (see further)
+* Others: Library specific ones like serializationError, FunctionNotFound, etc.
 
 #### **Network related failures**: 
+
 No network connection etc.
-  * *Due*: Able to specify a timeout for a callback, indicating that we want the answer within the specified time or never. This is for dealing with slow functions or network issues.
+* *Network disconnections*: Network disconnections can cause RPC to fail. The network might be disconnected before performing or during the remote call (Omission failures, crash failures). This may hamper an application relying on these RPCs. We therefore incorporate a mechanism to retry a RPC call when it has failed. Simply retrying a RPC call could cause operations to perform operations multiple times (calling functions which perform side-effects that are not idempotent). We use a mechanism of filters and caching to avoid this problem. Hence the caller can decide what guarantees, it want e.g. Maybe, At-Most-Once, Once.
+```javascript 
+myClient.rpcCall('remoteFunction', [a, b, c], function(err, res, retry) {
+   //err will contain a NetworkError, when we are disconnected.
+   if(err) retry();       
+});
+```
+* *Due*: Able to specify a timeout for a callback, indicating that we want the answer within the specified time or never. This is for dealing with slow functions or network issues.
 ```javascript 
 //We want the answer within 1 second
 myClient.rpcCall('remoteFunction', [a, b, c], function(err, res) {
-        
+    //err will contain TimeOutError when we did not get the result within 1second.
 }, 1000);
 ```
 
-  * *Mailbox*: If when performing a RPC the other side is not there, (e.g. temporary disconnection), these RPC's are buffered and forwarded upon reconnection. This works for both client-to-server RPC's and server-to-client RPC's. 
-  * *Leases*: Able to specify that the connection is leased for a certain time. During this time, the logical connection persists even if there are intermediate disconections. Resources are only freed when the lease expires. Leases can be renewed on successful performing or receiving a RPC.
-
 #### **Other**: 
-Access to socket.io network connection options and several other options for Leases and Due.
+Access to socket.io network connection options and other options.
