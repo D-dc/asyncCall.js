@@ -1,6 +1,6 @@
 'use strict';
 
-var options =  {
+var options = {
     reconnection: true, //auto reconnect
     reconnectionAttempts: Infinity, //attempts before giving up
     reconnectionDelay: 1000, //how long to wait before reconnect (doubles + randomized by randomizationFactor)
@@ -10,60 +10,75 @@ var options =  {
     autoConnect: true, //automatically connect
     defaultRpcTimeout: Infinity, //default delay before an RPC call should have its reply. Infinity = no timeout
     leaseRenewOnExpire: false,
-    throwNativeError:false
+    throwNativeError: false
 };
 
 
 var myClient = new ClientRpc('http://127.0.0.1:80', options);
 myClient.expose({
-    'testClient': function(a) {
+    'testClient': function (a) {
         console.log('testClient', a, ' called');
         return a;
     },
-    'ping': function(ctr) {
+    'ping': function (ctr) {
         console.log('ping ' + ctr);
-        setTimeout(function() {
+        setTimeout(function () {
             myClient.rpc('pong', [ctr]);
         }, 2000);
     }
 });
 
-//EVENTS called on client side
-myClient.on('connect', function() {
-    console.log('connect');
-}); // on connected (CLIENT)
-myClient.on('disconnect', function() {
-    console.log('disconnect!');
-}); // on disconnected (CLIENT)        
-myClient.on('reconnect_attempt', function() {
-    console.log('reconnect_attempt');
-}); //on start reconnnection (CLIENT)
-myClient.on('reconnecting', function() {
-    console.log('reconnecting');
-}); //on reconnecting (CLIENT)
-myClient.on('connect_error', function() {
-    console.log('connect_error');
-}); // (CLIENT)
-myClient.on('reconnect_error', function() {
-    console.log('reconnect_error');
-}); // (CLIENT)
-myClient.on('reconnect_failed', function() {
-    console.log('reconnect_failed');
-}); //(CLIENT)
-myClient.on('error', function(d) {
-    console.log('error', d);
+// //EVENTS called on client side
+// myClient.on('connect', function() {
+//     console.log('connect');
+// }); // on connected (CLIENT)
+// myClient.on('disconnect', function() {
+//     console.log('disconnect!');
+// }); // on disconnected (CLIENT)        
+// myClient.on('reconnect_attempt', function() {
+//     console.log('reconnect_attempt');
+// }); //on start reconnnection (CLIENT)
+// myClient.on('reconnecting', function() {
+//     console.log('reconnecting');
+// }); //on reconnecting (CLIENT)
+// myClient.on('connect_error', function() {
+//     console.log('connect_error');
+// }); // (CLIENT)
+// myClient.on('reconnect_error', function() {
+//     console.log('reconnect_error');
+// }); // (CLIENT)
+// myClient.on('reconnect_failed', function() {
+//     console.log('reconnect_failed');
+// }); //(CLIENT)
+// myClient.on('error', function(d) {
+//     console.log('error', d);
+// });
+// myClient.on('connecting', function() {
+//     console.log('connecting');
+// });
+// myClient.on('connect_failed', function() {
+//     console.log('connect_failed');
+// });
+// myClient.on('reconnect', function() {
+//     console.log('reconnect');
+// });
+// myClient.on('connect_timeout', function() {
+//     console.log('connect_timeout');
+// });
+myClient.onConnected(function () {
+    console.log('onConnect');
 });
-myClient.on('connecting', function() {
-    console.log('connecting');
+
+myClient.onDisconnected(function () {
+    console.log('onDisconnect');
 });
-myClient.on('connect_failed', function() {
-    console.log('connect_failed');
+
+myClient.onceConnected(function () {
+    console.log('onceConnect');
 });
-myClient.on('reconnect', function() {
-    console.log('reconnect');
-});
-myClient.on('connect_timeout', function() {
-    console.log('connect_timeout');
+
+myClient.onceDisconnected(function () {
+    console.log('onceDisconnect');
 });
 
 var a = 1;
@@ -77,10 +92,10 @@ var c = 3;
 /*
     CallServer No due => default keep waiting for reply for ever
 */
-var callServer = function() {
+var callServer = function () {
     console.log('CallServer called');
 
-    myClient.rpc('testRemote', [a, b, c], function(err, res) {
+    myClient.rpc('testRemote', [a, b, c], function (err, res) {
         console.log(' - Callback result param: ', res);
         console.log(' - Callback error param: ', err);
     });
@@ -90,10 +105,10 @@ var callServer = function() {
 /*
     CallServer with @Due: keep waiting until due or result received
 */
-var callServerDue = function() {
+var callServerDue = function () {
     console.log('CallServerDue called');
-    
-    myClient.rpc('testRemote', [a, b, c], function(err, res) {
+
+    myClient.rpc('testRemote', [a, b, c], function (err, res) {
         console.log(' - Callback result param: ', res);
         console.log(' - Callback error param: ', err);
     }, 2);
@@ -103,10 +118,10 @@ var callServerDue = function() {
 /*
     Call a function that does not exists on the server
 */
-var callServerInexist = function() {
+var callServerInexist = function () {
     console.log('CallServerInexist called');
 
-    myClient.rpc('testNonExists', [a, b, c], function(err, res) {
+    myClient.rpc('testNonExists', [a, b, c], function (err, res) {
         console.log(' - Callback result param: ', res);
         console.log(' - Callback error param: ', err);
     });
@@ -115,10 +130,10 @@ var callServerInexist = function() {
 /*
     Call a function that triggers an exception
 */
-var callServerTriggerException = function() {
-    
+var callServerTriggerException = function () {
+
     console.log('TriggerException called');
-    myClient.rpc('triggerException', [], function(err, res) {
+    myClient.rpc('triggerException', [], function (err, res) {
         console.log(' - Callback result param: ', res);
         console.log(' - Callback error param: ', err);
     });
