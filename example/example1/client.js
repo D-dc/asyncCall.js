@@ -15,6 +15,12 @@ var options = {
 
 
 var myClient = new ClientRpc('http://127.0.0.1:80', options);
+
+myClient.rpc('testRemote', [1, 2, 3], function (err, res) {
+    console.log(' - Callback result param: ', res);
+    console.log(' - Callback error param: ', err);
+});
+
 myClient.expose({
     'testClient': function (a) {
         console.log('testClient', a, ' called');
