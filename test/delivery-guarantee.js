@@ -145,15 +145,15 @@ describe('RPC delivery guarantees', function () {
         });
 
 
-        it('retry once.', function (done) {
+        it('retry once (+ new callback).', function (done) {
             this.timeout(5000);
-            var counter = 0;
+            var counter = 1;
             expect(myClient.RPC.sendMsgCounter).to.equal(7);
             expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(7);
 
             myClient.rpc('testErrorFunc', [counter], function (err, res, retry) {
 
-                counter++;
+
                 expect(err).not.to.equal(null);
 
                 expect(myClient.RPC.sendMsgCounter).to.equal(8);
@@ -161,7 +161,12 @@ describe('RPC delivery guarantees', function () {
                 if (counter === 2) {
                     done();
                 } else {
-                    retry();
+                    retry(function (originalContinuation) {
+                        return function (err, res, retry) {
+                            counter++;
+                            originalContinuation(err, res, retry);
+                        };
+                    });
                 }
             });
         });
@@ -174,7 +179,6 @@ describe('RPC delivery guarantees', function () {
             expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(8);
             myClient.rpc('testErrorFunc', [counter], function (err, res, retry) {
 
-                counter++;
                 expect(err).not.to.equal(null);
 
                 expect(myClient.RPC.sendMsgCounter).to.equal(9);
@@ -182,7 +186,12 @@ describe('RPC delivery guarantees', function () {
                 if (counter === 10) {
                     done();
                 } else {
-                    retry();
+                    retry(function (originalContinuation) {
+                        return function (err, res, retry) {
+                            counter++;
+                            originalContinuation(err, res, retry);
+                        };
+                    });
                 }
             });
         });
