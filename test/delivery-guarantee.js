@@ -88,7 +88,7 @@ describe('RPC delivery guarantees', function () {
 
             myClient.rpc('testErrorFunc', [], function (err, res, retry) {
 
-                expect(myClient.RPC.sendMsgCounter).to.equal(3)
+                expect(myClient.RPC.sendMsgCounter).to.equal(4)
                 expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(3)
                 expect(err).not.to.equal(null);
                 ctr++;
@@ -360,14 +360,14 @@ describe('RPC delivery guarantees', function () {
 
     describe('Case 4: already disconnected', function () {
 
-        it('Should not increase \'Counter\', single call.', function (done) {
+        it('Should have correct \'Counter\' if disconnected, single call.', function (done) {
             expect(myClient.RPC.sendMsgCounter).to.equal(212);
             expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(212);
 
             myClient.RPC.connected = false;
 
             myClient.rpc('testErrorFunc', [], function (err, res) {
-                expect(myClient.RPC.sendMsgCounter).to.equal(212);
+                expect(myClient.RPC.sendMsgCounter).to.equal(213);
                 expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(212);
                 expect(err).not.to.equal(null);
                 done();
@@ -376,21 +376,21 @@ describe('RPC delivery guarantees', function () {
         });
 
 
-        it('Should not increase \'Counter\', multiple calls.', function (done) {
-            expect(myClient.RPC.sendMsgCounter).to.equal(212);
+        it('Should have correct \'Counter\' if disconnected, multiple calls.', function (done) {
+            expect(myClient.RPC.sendMsgCounter).to.equal(213);
             expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(212);
 
             myClient.RPC.connected = false;
 
             myClient.rpc('testErrorFunc', [], function (err, res) {
-                expect(myClient.RPC.sendMsgCounter).to.equal(212);
+                expect(myClient.RPC.sendMsgCounter).to.equal(214);
                 expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(212);
                 expect(err).not.to.equal(null);
 
             });
 
             myClient.rpc('testErrorFunc', [], function (err, res) {
-                expect(myClient.RPC.sendMsgCounter).to.equal(212);
+                expect(myClient.RPC.sendMsgCounter).to.equal(215);
                 expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(212);
                 expect(err).not.to.equal(null);
                 done();
@@ -401,7 +401,7 @@ describe('RPC delivery guarantees', function () {
 
         it('Should not increase \'Counter\', multiple calls.', function (done) {
             this.timeout(5000);
-            expect(myClient.RPC.sendMsgCounter).to.equal(212);
+            expect(myClient.RPC.sendMsgCounter).to.equal(215);
             expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(212);
 
             myClient.RPC.connected = false;
@@ -411,7 +411,7 @@ describe('RPC delivery guarantees', function () {
             while (ctr <= 5) {
 
                 myClient.rpc('testErrorFunc', [], function (err, res, retry) {
-                    expect(myClient.RPC.sendMsgCounter).to.equal(212);
+                    expect(myClient.RPC.sendMsgCounter).to.equal(215 + ctr);
                     expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(212);
                     expect(err).not.to.equal(null);
                     dones++;
@@ -433,15 +433,15 @@ describe('RPC delivery guarantees', function () {
 
         it('Subsequent calls should fail.', function (done) {
             this.timeout(5000);
-            expect(myClient.RPC.sendMsgCounter).to.equal(212);
+            expect(myClient.RPC.sendMsgCounter).to.equal(220);
             expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(212);
 
             myClient.RPC.connected = true;
 
 
             myClient.rpc('testErrorFunc', [], function (err, res, retry) {
-                expect(myClient.RPC.sendMsgCounter).to.equal(213);
-                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(213);
+
+                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(221);
                 expect(err).not.to.equal(null);
                 expect(err).to.be.an.instanceof(Error);
 
@@ -453,22 +453,22 @@ describe('RPC delivery guarantees', function () {
             //Other waiting calls should fail with NetworkError at this time.
 
             myClient.rpc('testErrorFunc', [], function (err, res, retry) {
-                expect(myClient.RPC.sendMsgCounter).to.equal(213);
-                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(213);
+
+                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(221);
                 expect(err).not.to.equal(null);
                 expect(err).to.be.an.instanceof(NetworkError);
             });
 
             myClient.rpc('testErrorFunc', [], function (err, res, retry) {
-                expect(myClient.RPC.sendMsgCounter).to.equal(213);
-                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(213);
+
+                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(221);
                 expect(err).not.to.equal(null);
                 expect(err).to.be.an.instanceof(NetworkError);
             });
 
             myClient.rpc('testErrorFunc', [], function (err, res, retry) {
-                expect(myClient.RPC.sendMsgCounter).to.equal(213);
-                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(213);
+                expect(myClient.RPC.sendMsgCounter).to.equal(224);
+                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(221);
                 expect(err).not.to.equal(null);
                 expect(err).to.be.an.instanceof(NetworkError);
 
@@ -479,16 +479,14 @@ describe('RPC delivery guarantees', function () {
 
         it('Subsequent calls should fail.', function (done) {
 
-            expect(myClient.RPC.sendMsgCounter).to.equal(213);
-            expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(213);
+            expect(myClient.RPC.sendMsgCounter).to.equal(224);
+            expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(221);
 
             myClient.RPC.connected = true;
 
             var ctr = 0;
             myClient.rpc('testErrorFunc', [], function (err, res, retry) {
-                //counters should be 213 or 214
-                expect(myClient.RPC.sendMsgCounter).to.be.below(215);
-                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.be.below(215);
+                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.be.below(226);
                 expect(err).not.to.equal(null);
 
                 if (ctr === 0) {
@@ -503,8 +501,7 @@ describe('RPC delivery guarantees', function () {
 
             var ctr2 = 0;
             myClient.rpc('testErrorFunc', [], function (err, res, retry) {
-                expect(myClient.RPC.sendMsgCounter).to.be.below(215);
-                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.be.below(215);
+                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.be.below(226);
                 expect(err).not.to.equal(null);
                 expect(err).to.be.an.instanceof(NetworkError);
 
@@ -517,8 +514,8 @@ describe('RPC delivery guarantees', function () {
             });
 
             myClient.rpc('testErrorFunc', [], function (err, res, retry) {
-                expect(myClient.RPC.sendMsgCounter).to.be.below(215);
-                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.be.below(215);
+                expect(myClient.RPC.sendMsgCounter).to.equal(227);
+                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.be.below(226);
                 expect(err).not.to.equal(null);
                 expect(err).to.be.an.instanceof(NetworkError);
 
@@ -529,14 +526,14 @@ describe('RPC delivery guarantees', function () {
 
         it('Retry after reconnect call should work', function (done) {
             this.timeout(5000);
-            expect(myClient.RPC.sendMsgCounter).to.equal(214);
-            expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(214);
+            expect(myClient.RPC.sendMsgCounter).to.equal(227);
+            expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(225);
 
             myClient.RPC.connected = true;
 
             myClient.rpc('testErrorFunc', [], function (err, res, retry) {
-                expect(myClient.RPC.sendMsgCounter).to.equal(215);
-                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(215);
+
+                expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(228);
                 expect(err).not.to.equal(null);
                 expect(err).to.be.an.instanceof(Error);
 
@@ -552,8 +549,8 @@ describe('RPC delivery guarantees', function () {
 
                 if (ctr === 0) {
                     myClient.RPC.connected = true;
-                    expect(myClient.RPC.sendMsgCounter).to.equal(215);
-                    expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(215);
+                    expect(myClient.RPC.sendMsgCounter).to.equal(229);
+                    expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(228);
                     expect(err).to.be.an.instanceof(NetworkError);
                     ctr++;
 
@@ -564,8 +561,8 @@ describe('RPC delivery guarantees', function () {
 
                 } else {
                     expect(err).not.be.an.instanceof(NetworkError);
-                    expect(myClient.RPC.sendMsgCounter).to.equal(216);
-                    expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(216);
+                    expect(myClient.RPC.sendMsgCounter).to.equal(229);
+                    expect(getServerRpcOfClient(myClient.id).recMsgCounter).to.equal(229);
                     done();
                 }
 
