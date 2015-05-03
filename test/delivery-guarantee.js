@@ -3,16 +3,13 @@
 var express = require('express'),
     app = express(),
     Excpt = require('../lib/exception.js'),
-    serverHttp = require('http').createServer(app),
     ServerRpc = require('../lib/rpc-server.js'),
     ClientRpc = require('../lib/rpc-client.js'),
     port = 8125,
     assert = require("assert"),
     expect = require('chai').expect;
 
-serverHttp.listen(port, function () {
-    console.log('Server listening at port %d', port);
-});
+
 app.use("/", express.static(__dirname + '/'));
 
 var list = [];
@@ -32,7 +29,7 @@ var methods = {
     }
 };
 
-var myServer = new ServerRpc(serverHttp, {
+var myServer = new ServerRpc(app, port, {
     throwNativeError: true
 });
 myServer.expose(methods);

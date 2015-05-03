@@ -11,9 +11,8 @@ var serverHttp;
 
 var makeServer = function (methods, options) {
     var app = express();
-    serverHttp = require('http').createServer(app).listen(port);
     app.use("/", express.static(__dirname + '/'));
-    var s = new ServerRpc(serverHttp, options);
+    var s = new ServerRpc(app, port, options);
     s.expose(methods);
     return s;
 };
@@ -87,7 +86,6 @@ var leaseShortTimeNoRenew = {
 
 var cleanup = function () {
     port++;
-    serverHttp.close();
 };
 
 describe('Server tests', function () {

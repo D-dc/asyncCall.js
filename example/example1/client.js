@@ -9,12 +9,11 @@ var options = {
     timeout: 2000, //time before connect_error, connect_timeout events
     autoConnect: true, //automatically connect
     defaultRpcTimeout: Infinity, //default delay before an RPC call should have its reply. Infinity = no timeout
-    leaseRenewOnExpire: false,
     throwNativeError: false
 };
 
 
-var myClient = new ClientRpc('http://127.0.0.1:80', options);
+var myClient = new ClientRpc('http://127.0.0.1:3000', options);
 
 myClient.rpc('testRemote', [1, 2, 3], function (err, res) {
     console.log(' - Callback result param: ', res);

@@ -2,13 +2,10 @@
 
 var express = require('express'),
     app = express(),
-    serverHttp = require('http').createServer(app),
     ServerRpc = require('../../lib/rpc-server.js'),
     port = process.env.PORT || 80;
 
-serverHttp.listen(port, function() {
-    console.log('Server listening at port %d', port);
-});
+
 
 app.use('/client', express.static(__dirname + '/../../client/'));
 app.use('/', express.static(__dirname + '/'));
@@ -20,7 +17,7 @@ var options = {
 };
 
 // make the ServerRpc by giving the http server, options
-var myServer = new ServerRpc(serverHttp, options);
+var myServer = new ServerRpc(app, port, options);
 //Expose functions to be called from client
 myServer.expose({
     'ping': function(counter) {

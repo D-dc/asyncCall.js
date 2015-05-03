@@ -1,15 +1,12 @@
 var express = require('express'),
     app = express(),
-    serverHttp = require('http').createServer(app),
     ServerRpc = require('../lib/rpc-server.js'),
     ClientRpc = require('../lib/rpc-client.js'),
     port = 8124,
     assert = require("assert"),
     expect = require('chai').expect;
 
-serverHttp.listen(port, function() {
-    console.log('Server listening at port %d', port);
-});
+
 app.use("/", express.static(__dirname + '/'));
 
 function simulateSlowComputation(millis) {
@@ -85,7 +82,7 @@ var methods = {
     }
 };
 
-var myServer = new ServerRpc(serverHttp, {throwNativeError:false});
+var myServer = new ServerRpc(app, port, {throwNativeError:false});
 myServer.expose(methods);
 
 var myClient = new ClientRpc('http://127.0.0.1:8124', {throwNativeError:false});
