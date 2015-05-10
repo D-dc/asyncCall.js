@@ -25,16 +25,17 @@ var c = 1;
 
 //Expose functions to be called from client
 myServer.expose({
-     'testRemote': function(a, b) {
+     'testRemote': function(a, b, d, callback) {
          //excess arguments are accessible via 'arguments' variable
          var args = Array.prototype.slice.call(arguments);
          console.log('testRemote called, args: ' + args);
          c++;
-         return a + b + c;
+         callback(undefined, a + b + c);
      },
-     'triggerException': function(){
+     'triggerException': function(callback){
         var d;
         d.getA; // will trigger TypeError
+        callback(undefined, d);
      }
 });
 
@@ -60,7 +61,7 @@ var callClient = function() {
 
     //We call the testclient function on every connected client.
     //temporarily disconnected clients will receive the call upon reconnection.
-    myServer.rpc('testClient', [d], function(err, res) {
+    myServer.rpc('testClient', d, function(err, res) {
         console.log('testClient reply ', err, res);
         d++;    
     });

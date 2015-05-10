@@ -37,7 +37,7 @@ describe('lib/exception.js tests', function() {
 
         it('library Error', function(done) {
             var e = new FunctionNotFoundError('message');
-            
+
             expect(Excpt.isException(e)).to.be.true;
             expect(Excpt.isImplicitException(e)).to.be.true;
             expect(Excpt.isOfError(e)).to.be.true;
@@ -237,7 +237,7 @@ describe('lib/exception.js tests', function() {
 
         describe('other throwables: (node)', function() {
             //
-            before(function (){
+            before(function() {
                 global.CustomError = CustomError;
             });
 
@@ -251,10 +251,10 @@ describe('lib/exception.js tests', function() {
                 expect(s).to.be.an.instanceof(CustomError);
                 done();
             });
-        });    
+        });
 
         describe('other throwables: (browser)', function() {
-            before(function (){
+            before(function() {
                 window = {};
                 window.CustomError = CustomError;
             });
@@ -269,7 +269,7 @@ describe('lib/exception.js tests', function() {
                 expect(s).to.be.an.instanceof(CustomError);
                 done();
             });
-        });    
+        });
 
     });
 
