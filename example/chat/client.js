@@ -1,20 +1,11 @@
 'use strict';
 
-var options = {
-    defaultRpcTimeout: Infinity,
-    leaseRenewOnExpire: true
-};
 
-//HTML elements -> jquery
+var myClient = new ClientRpc('http://127.0.0.1:3000');
 
-var $messages = $('.chatScreen'); // Messages area
-var $message = $('.message'); // Input message
-var $author = $('.author'); // Input author
-
-
-var myClient = new ClientRpc('http://127.0.0.1:80', options);
+//Exposed interface.
 myClient.expose({
-    'hearMsg': function (author, msg) {
+    'hearMsg': function (author, msg, callback) {
 
         console.log('Received', author, msg);
         $messages.append('<p><b>' + author + '</b>:' + msg + '</p>');
@@ -22,18 +13,19 @@ myClient.expose({
     }
 });
 
-/*
-    EXAMPLES
-*/
+
+//HTML elements -> jquery
+
+var $messages = $('.chatScreen'); // Messages area
+var $message = $('.message'); // Input message
+var $author = $('.author'); // Input author
 
 var speakMsg = function () {
 
-    //get the values
     var msg = $message.val();
     var author = $author.val();
 
-    //
-    myClient.rpcCall('sayMsg', [author, msg], function (err, res) {
+    myClient.rpc('sayMsg', author, msg, function (err, res) {
         if (err)
             alert('Could not send message' + err);
         else

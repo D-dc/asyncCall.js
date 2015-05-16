@@ -11,9 +11,6 @@ app.use('/', express.static(__dirname + '/'));
 
 
 var options = {
-    pingTimeout: 6000, //timeout from client to receive new heartbeat from server (value shipped to client) = time client to server calls are buffered!                 //
-    pingInterval: 2500, //timeout when server should send heartbeat to client
-    defaultRpcTimeout: Infinity, //default delay before an RPC call should have its reply. Infinity = no timeout
     throwNativeError:false
 };
 
@@ -28,14 +25,14 @@ myServer.expose({
      'testRemote': function(a, b, d, callback) {
          //excess arguments are accessible via 'arguments' variable
          var args = Array.prototype.slice.call(arguments);
-         console.log('testRemote called, args: ' + args);
+         console.log('testRemote called');
          c++;
-         callback(undefined, a + b + c);
+         callback(null, a + b + c);
      },
      'triggerException': function(callback){
         var d;
         d.getA; // will trigger TypeError
-        callback(undefined, d);
+        callback(null, d);
      }
 });
 

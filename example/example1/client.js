@@ -1,14 +1,6 @@
 'use strict';
 
 var options = {
-    reconnection: true, //auto reconnect
-    reconnectionAttempts: Infinity, //attempts before giving up
-    reconnectionDelay: 1000, //how long to wait before reconnect (doubles + randomized by randomizationFactor)
-    reconnectionDelayMax: 5000, //max delay before reconnection
-    randomizationFactor: 0.5,
-    timeout: 2000, //time before connect_error, connect_timeout events
-    autoConnect: true, //automatically connect
-    defaultRpcTimeout: Infinity, //default delay before an RPC call should have its reply. Infinity = no timeout
     throwNativeError: false
 };
 

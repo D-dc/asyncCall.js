@@ -2,32 +2,20 @@
 
 var express = require('express'),
     app = express(),
-    ServerRpc = require('../../lib/rpc-server.js'),
-    port = process.env.PORT || 80;
+    ServerRpc = require('../../lib/rpc-server.js');
 
 app.use('/client', express.static(__dirname + '/../../client/'));
 app.use('/', express.static(__dirname + '/'));
 
 
-//We Put calls (chat messages) in queues for 2 minutes.
-var options = {
-    pingTimeout: 120000, //client2server
-    pingInterval: 25000,
-    leaseLifeTime: 120000, //server2client
-    leaseRenewOnCall: true,
-    leaseRenewalTime: 120000,
-    defaultRpcTimeout: Infinity
-};
-
-// make the ServerRpc by giving the http server, options
-var myServer = new ServerRpc(app, port, options);
+var myServer = new ServerRpc(app);
 
 
-//Expose functions to be called from client
+//Exposed interface.
 myServer.expose({
-    'sayMsg': function (author, message) {
+    'sayMsg': function (author, message, callback) {
         console.log('broadcasting to all clients listening');
 
-        myServer.rpcCall('hearMsg', [author, message]);
+        myServer.rpc('hearMsg', author, message);
     }
 });
