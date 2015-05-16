@@ -112,31 +112,31 @@ describe('lib/exception.js tests', function() {
             done();
         });
 
-        it('other throwables: Number (map to Error)', function(done) {
+        it('other throwables: Number (map to ApplicationLiteralError)', function(done) {
             var e = 5,
                 s = Excpt.serialize(e);
 
-            expect(s.name).to.equal('Error');
+            expect(s.name).to.equal('ApplicationLiteralError');
             expect(s.message).not.to.be.undefined;
             expect(s.stack).not.to.be.undefined;
             done();
         });
 
-        it('other throwables: String (map to Error)', function(done) {
+        it('other throwables: String (map to ApplicationLiteralError)', function(done) {
             var e = 'message',
                 s = Excpt.serialize(e);
 
-            expect(s.name).to.equal('Error');
+            expect(s.name).to.equal('ApplicationLiteralError');
             expect(s.message).not.to.be.undefined;
             expect(s.stack).not.to.be.undefined;
             done();
         });
 
-        it('other throwables: Object (map to Error)', function(done) {
+        it('other throwables: Object (map to ApplicationLiteralError)', function(done) {
             var e = {},
                 s = Excpt.serialize(e);
 
-            expect(s.name).to.equal('Error');
+            expect(s.name).to.equal('ApplicationLiteralError');
             expect(s.message).not.to.be.undefined;
             expect(s.stack).not.to.be.undefined;
             done();
@@ -191,36 +191,27 @@ describe('lib/exception.js tests', function() {
             done();
         });
 
-        it('other throwables: number (map to Error)', function(done) {
+        it('other throwables: number (map to ApplicationLiteralError)', function(done) {
             var e = 5,
                 s = Excpt.deserialize(Excpt.serialize(e));
 
-            expect(s.name).to.equal('Error');
-            expect(s.name).not.to.be.undefined;
-            expect(s.stack).not.to.be.undefined;
-            expect(s).to.be.an.instanceof(Error);
+            expect(s).to.equal(e);
             done();
         });
 
-        it('other throwables: string (map to Error)', function(done) {
+        it('other throwables: string (map to ApplicationLiteralError)', function(done) {
             var e = 'message',
                 s = Excpt.deserialize(Excpt.serialize(e));
 
-            expect(s.name).to.equal('Error');
-            expect(s.name).not.to.be.undefined;
-            expect(s.stack).not.to.be.undefined;
-            expect(s).to.be.an.instanceof(Error);
+            expect(s).to.equal(e);
             done();
         });
 
-        it('other throwables: object (map to Error)', function(done) {
+        it('other throwables: object (map to ApplicationLiteralError)', function(done) {
             var e = {},
                 s = Excpt.deserialize(Excpt.serialize(e));
 
-            expect(s.name).to.equal('Error');
-            expect(s.message).not.to.be.undefined;
-            expect(s.stack).not.to.be.undefined;
-            expect(s).to.be.an.instanceof(Error);
+            expect(s).to.eql(e);
             done();
         });
 

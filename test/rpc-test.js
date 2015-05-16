@@ -22,23 +22,23 @@ var g = 0;
 
 var methods = {
     'testFuncNoArgs': function(callback) {
-        callback(undefined, true);
+        callback(null, true);
     },
     'testFuncSingleArg': function(a, callback) {
-        callback(undefined, a);
+        callback(null, a);
     },
     'testFuncTwoArg': function(a, b, callback) {
-        callback(undefined, (a + b));
+        callback(null, (a + b));
     },
     'testFuncNoReturn': function(callback) {
 
     },
     'testFuncSum': function(a, b, callback) {
-        callback(undefined, a + b);
+        callback(null, a + b);
     },
     'testFuncIncrement': function(a, callback) {
         a++;
-        callback(undefined, a);
+        callback(null, a);
     },
     /* Exception testing */
     'testExceptionManualCallback': function(callback) {
@@ -51,7 +51,7 @@ var methods = {
         throw 5;
     },
     'testImplicitException': function(b, callback) {
-        callback(undefined,  b.length);
+        callback(null,  b.length);
     },
     'testImplicitExceptionEvalError': function(callback) {
         throw new EvalError('eval error message');
@@ -61,7 +61,7 @@ var methods = {
     },
     'testImplicitExceptionReferenceError': function(callback) {
         var a = 5;
-        callback(undefined,  a + b);
+        callback(null,  a + b);
     },
     'testImplicitExceptionSyntaxError': function(callback) {
         eval("var a = *2;");
@@ -74,11 +74,11 @@ var methods = {
     },
     'testSlowComputation': function(callback) {
         simulateSlowComputation(1000); //take some time to give reply
-        callback(undefined, true);
+        callback(null, true);
     },
     'testProgVar': function(callback) {
         g++;
-        callback(undefined, g);
+        callback(null, g);
     }
 };
 
@@ -358,8 +358,7 @@ describe('RPC tests', function() {
 
             it('rpc body custom throwable should map to Error', function(done) {
                 myClient.rpc('testExplicitExceptionCustom', function(err, res) {
-                    expect(err).not.to.be.null;
-                    expect(err.name).to.equal('Error');
+                    expect(err).to.equal(5);
                     expect(res).to.be.undefined;
                     done();
                 });
