@@ -21,7 +21,7 @@ myServer.expose({
         // which makes a lot of sense at the server-side.
 
         setTimeout(function(){
-            that.rpc('pong', [counter]);//broadcast
+            that.rpc('pong', [counter]);
         }, 2000);
 
         var now = new Date();
