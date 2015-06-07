@@ -82,10 +82,10 @@ var methods = {
     }
 };
 
-var myServer = new ServerRpc(app, port, {throwNativeError:false});
+var myServer = new ServerRpc(app, port, {debugMode:false});
 myServer.expose(methods);
 
-var myClient = new ClientRpc('http://127.0.0.1:8124', {throwNativeError:false});
+var myClient = new ClientRpc('http://127.0.0.1:8124', {debugMode:false});
 myClient.expose({});
 
 // TESTS

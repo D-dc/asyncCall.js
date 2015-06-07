@@ -1,4 +1,4 @@
-var Excpt = require('../lib/exception.js'),
+var ExceptionHandler = require('../lib/exception-handler.js'),
     assert = require("assert"),
     expect = require('chai').expect;
 
@@ -14,7 +14,10 @@ function CustomError(message) {
 CustomError.prototype = new Error();
 CustomError.prototype.constructor = CustomError;
 
-describe('lib/exception.js tests', function() {
+var Excpt = new ExceptionHandler(true);
+var ExcptNoDebug = new ExceptionHandler(false);
+
+describe('lib/exception-handler.js tests', function() {
     describe('internals', function() {
         it('Error', function(done) {
             var e = new Error('message');
@@ -154,6 +157,7 @@ describe('lib/exception.js tests', function() {
     });
 
     describe('deserialize tests', function() {
+
         it('error', function(done) {
             var e = new Error('message'),
                 s = Excpt.deserialize(Excpt.serialize(e));
@@ -262,6 +266,33 @@ describe('lib/exception.js tests', function() {
             });
         });
 
+    });
+
+    describe('debug mode', function() {
+            
+        it('Stacktrace with debug mode should be serialized', function(done) {
+            var e = new Error('message'),
+            s = ExcptNoDebug.deserialize(Excpt.serialize(e));
+
+            expect(s.name).to.equal('Error');
+            expect(s.name).to.equal(e.name);
+            expect(s.message).to.equal(e.message);
+            expect(s.stack).to.equal(e.stack);
+            expect(s).to.be.an.instanceof(Error);
+            done();
+        });
+
+        it('Stacktrace without debug mode should not be serialized', function(done) {
+            var e = new Error('message'),
+            s = ExcptNoDebug.deserialize(ExcptNoDebug.serialize(e));
+
+            expect(s.name).to.equal('Error');
+            expect(s.name).to.equal(e.name);
+            expect(s.message).to.equal(e.message);
+            expect(s.stack).to.equal('');
+            expect(s).to.be.an.instanceof(Error);
+            done();
+        });
     });
 
 });

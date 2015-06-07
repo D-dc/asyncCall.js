@@ -2,7 +2,6 @@
 
 var express = require('express'),
     app = express(),
-    Excpt = require('../lib/exception.js'),
     ServerRpc = require('../lib/rpc-server.js'),
     ClientRpc = require('../lib/rpc-client.js'),
     port = 8125,

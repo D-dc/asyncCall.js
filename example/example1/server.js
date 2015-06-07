@@ -11,7 +11,7 @@ app.use('/', express.static(__dirname + '/'));
 
 
 var options = {
-    throwNativeError:false
+    debugMode:false
 };
 
 

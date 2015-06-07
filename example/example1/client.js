@@ -1,7 +1,7 @@
 'use strict';
 
 var options = {
-    throwNativeError: false
+    debugMode: false
 };
 
 
