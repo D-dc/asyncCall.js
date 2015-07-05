@@ -46,9 +46,6 @@ var methods = {
 var defaultOptions = {
     pingTimeout: 6000,
     pingInterval: 2500,
-    leaseLifeTime: 60000,
-    leaseRenewOnCall: true,
-    leaseRenewalTime: 60000,
     defaultRpcTimeout: Infinity
 };
 

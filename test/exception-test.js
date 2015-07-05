@@ -89,9 +89,9 @@ describe('lib/exception-handler.js tests', function() {
             var e = new Error('message'),
                 s = Excpt.serialize(e);
 
-            expect(s.name).not.to.be.undefined;
-            expect(s.message).not.to.be.undefined;
-            expect(s.stack).not.to.be.undefined;
+            expect(s.name).to.equal('Error');
+            expect(s.type).to.equal('errio');
+            expect(s.error).not.to.be.undefined;
             done();
         });
 
@@ -99,9 +99,9 @@ describe('lib/exception-handler.js tests', function() {
             var e = new SyntaxError('message'),
                 s = Excpt.serialize(e);
 
-            expect(s.name).not.to.be.undefined;
-            expect(s.message).not.to.be.undefined;
-            expect(s.stack).not.to.be.undefined;
+            expect(s.name).to.equal('SyntaxError');
+            expect(s.type).to.equal('errio');
+            expect(s.error).not.to.be.undefined;    
             done();
         });
 
@@ -109,9 +109,9 @@ describe('lib/exception-handler.js tests', function() {
             var e = new FunctionNotFoundError('message'),
                 s = Excpt.serialize(e);
 
-            expect(s.name).not.to.be.undefined;
-            expect(s.message).not.to.be.undefined;
-            expect(s.stack).not.to.be.undefined;
+            expect(s.name).to.equal('FunctionNotFoundError');
+            expect(s.type).to.equal('errio');
+            expect(s.error).not.to.be.undefined;    
             done();
         });
 
@@ -119,9 +119,9 @@ describe('lib/exception-handler.js tests', function() {
             var e = 5,
                 s = Excpt.serialize(e);
 
-            expect(s.name).to.equal('ApplicationLiteralError');
-            expect(s.message).not.to.be.undefined;
-            expect(s.stack).not.to.be.undefined;
+            expect(s.name).to.equal('LiteralError');
+            expect(s.type).to.equal('LiteralError');
+            expect(s.error).not.to.be.undefined;
             done();
         });
 
@@ -129,9 +129,9 @@ describe('lib/exception-handler.js tests', function() {
             var e = 'message',
                 s = Excpt.serialize(e);
 
-            expect(s.name).to.equal('ApplicationLiteralError');
-            expect(s.message).not.to.be.undefined;
-            expect(s.stack).not.to.be.undefined;
+            expect(s.name).to.equal('LiteralError');
+            expect(s.type).to.equal('LiteralError');
+            expect(s.error).not.to.be.undefined;
             done();
         });
 
@@ -139,19 +139,20 @@ describe('lib/exception-handler.js tests', function() {
             var e = {},
                 s = Excpt.serialize(e);
 
-            expect(s.name).to.equal('ApplicationLiteralError');
-            expect(s.message).not.to.be.undefined;
-            expect(s.stack).not.to.be.undefined;
+            expect(s.name).to.equal('LiteralError');
+            expect(s.type).to.equal('LiteralError');
+            expect(s.error).not.to.be.undefined;
             done();
         });
 
         it('other throwables: CustomError', function(done) {
             var e = new CustomError("my custom error."),
                 s = Excpt.serialize(e);
-
+            
             expect(s.name).to.equal('CustomError');
-            expect(s.message).not.to.be.undefined;
-            expect(s.stack).not.to.be.undefined;
+            expect(s.type).to.equal('errio');
+            expect(s.error).not.to.be.undefined;
+
             done();
         });
     });
@@ -159,43 +160,49 @@ describe('lib/exception-handler.js tests', function() {
     describe('deserialize tests', function() {
 
         it('error', function(done) {
-            var e = new Error('message'),
-                s = Excpt.deserialize(Excpt.serialize(e));
+            var e = new Error('message');
+                e.customProperty = 42; //we add a custom property to exception
+            var s = Excpt.deserialize(Excpt.serialize(e));
 
             expect(s.name).to.equal('Error');
             expect(s.name).to.equal(e.name);
             expect(s.message).to.equal(e.message);
-            expect(s.stack).to.equal(e.stack);
+            expect(s.stack).not.to.be.undefined;
             expect(s).to.be.an.instanceof(Error);
+            expect(s.customProperty).to.equal(42);
             done();
         });
 
         it('sub type of error', function(done) {
-            var e = new SyntaxError('message'),
-                s = Excpt.deserialize(Excpt.serialize(e));
+            var e = new SyntaxError('message');
+                e.customProperty = 42; //we add a custom property to exception
+            var s = Excpt.deserialize(Excpt.serialize(e));
 
             expect(s.name).to.equal('SyntaxError');
             expect(s.name).to.equal(e.name);
             expect(s.message).to.equal(e.message);
-            expect(s.stack).to.equal(e.stack);
+            expect(s.stack).not.to.be.undefined;
             expect(s).to.be.an.instanceof(Error);
+            expect(s.customProperty).to.equal(42);
             done();
         });
 
         it('library Error', function(done) {
-            var e = new FunctionNotFoundError('message'),
+            var e = new FunctionNotFoundError('message');
+                e.customProperty = 42; //we add a custom property to exception
                 s = Excpt.deserialize(Excpt.serialize(e));
 
             expect(s.name).to.equal('FunctionNotFoundError');
             expect(s.name).to.equal(e.name);
             expect(s.message).to.equal(e.message);
-            expect(s.stack).to.equal(e.stack);
+            expect(s.stack).not.to.be.undefined;
             expect(s).to.be.an.instanceof(Error);
             expect(s).to.be.an.instanceof(FunctionNotFoundError);
+            expect(s.customProperty).to.equal(42);
             done();
         });
 
-        it('other throwables: number (map to ApplicationLiteralError)', function(done) {
+        it('other throwables: number (map to LiteralError)', function(done) {
             var e = 5,
                 s = Excpt.deserialize(Excpt.serialize(e));
 
@@ -203,7 +210,7 @@ describe('lib/exception-handler.js tests', function() {
             done();
         });
 
-        it('other throwables: string (map to ApplicationLiteralError)', function(done) {
+        it('other throwables: string (map to LiteralError)', function(done) {
             var e = 'message',
                 s = Excpt.deserialize(Excpt.serialize(e));
 
@@ -211,7 +218,7 @@ describe('lib/exception-handler.js tests', function() {
             done();
         });
 
-        it('other throwables: object (map to ApplicationLiteralError)', function(done) {
+        it('other throwables: object (map to LiteralError)', function(done) {
             var e = {},
                 s = Excpt.deserialize(Excpt.serialize(e));
 
@@ -226,6 +233,7 @@ describe('lib/exception-handler.js tests', function() {
             expect(s.name).to.equal('Error');
             expect(s.stack).not.to.be.undefined;
             expect(s).to.be.an.instanceof(Error);
+
             //Exception not defined.
             done();
         });
@@ -237,13 +245,15 @@ describe('lib/exception-handler.js tests', function() {
             });
 
             it('other throwables: CustomError', function(done) {
-                var e = new CustomError("my custom error."),
-                    s = Excpt.deserialize(Excpt.serialize(e));
+                var e = new CustomError("my custom error.");
+                    e.customProperty = 42; //we add a custom property to exception
+                var s = Excpt.deserialize(Excpt.serialize(e));
 
                 expect(s.name).to.equal('CustomError');
                 expect(s.stack).not.to.be.undefined;
                 expect(s).to.be.an.instanceof(Error);
                 expect(s).to.be.an.instanceof(CustomError);
+                expect(s.customProperty).to.equal(42);
                 done();
             });
         });
@@ -255,13 +265,15 @@ describe('lib/exception-handler.js tests', function() {
             });
 
             it('other throwables: CustomError', function(done) {
-                var e = new CustomError("my custom error."),
-                    s = Excpt.deserialize(Excpt.serialize(e));
+                var e = new CustomError("my custom error.");
+                    e.customProperty = 42; //we add a custom property to exception
+                var s = Excpt.deserialize(Excpt.serialize(e));
 
                 expect(s.name).to.equal('CustomError');
                 expect(s.stack).not.to.be.undefined;
                 expect(s).to.be.an.instanceof(Error);
                 expect(s).to.be.an.instanceof(CustomError);
+                expect(s.customProperty).to.equal(42);
                 done();
             });
         });
@@ -284,12 +296,13 @@ describe('lib/exception-handler.js tests', function() {
 
         it('Stacktrace without debug mode should not be serialized', function(done) {
             var e = new Error('message'),
-            s = ExcptNoDebug.deserialize(ExcptNoDebug.serialize(e));
+                ser = ExcptNoDebug.serialize(e),
+                s = ExcptNoDebug.deserialize(ser);
 
             expect(s.name).to.equal('Error');
             expect(s.name).to.equal(e.name);
             expect(s.message).to.equal(e.message);
-            expect(s.stack).to.equal('');
+            expect(ser.stack).to.be.undefined;
             expect(s).to.be.an.instanceof(Error);
             done();
         });
